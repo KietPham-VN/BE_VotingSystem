@@ -10,3 +10,6 @@ BE_VotingSystem/appsettings.json
 BE_VotingSystem/BE_VotingSystem.csproj.user
 .cursor/rules/dotnet-api.mdc
 appsettings.json
+.env
+.env.*
+!.env.example

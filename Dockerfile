@@ -32,4 +32,8 @@ WORKDIR /app
 ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
 
 COPY --from=publish /app/publish .
+
+# 👉 Copy secret appsettings.json nếu có (Render mount ở /etc/secrets)
+RUN if [ -f /etc/secrets/appsettings.json ]; then cp /etc/secrets/appsettings.json ./appsettings.json; fi
+
 ENTRYPOINT ["dotnet", "BE_VotingSystem.dll"]
