@@ -1,0 +1,12 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.idea/
+BE_VotingSystem/Infrastructure/Database/Migrations/
+BE_VotingSystem/appsettings.json
+/.vs
+BE_VotingSystem/BE_VotingSystem.csproj.user
+.cursor/rules/dotnet-api.mdc
+appsettings.json
