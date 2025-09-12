@@ -7,6 +7,8 @@ using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Infrastructure.Database;
 using BE_VotingSystem.Infrastructure.Services;
 using BE_VotingSystem.Infrastructure.Setting;
+using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
@@ -118,6 +120,29 @@ public static class DependencyInjection
                 };
             });
 
+        // Hangfire configuration
+        services.AddHangfire(configuration => configuration
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseStorage(
+                new MySqlStorage(
+                    dbSettings.DefaultConnection,
+                    new MySqlStorageOptions
+                    {
+                        QueuePollInterval = TimeSpan.FromSeconds(10),
+                        JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                        CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                        PrepareSchemaIfNecessary = true,
+                        DashboardJobListLimit = 25000,
+                        TransactionTimeout = TimeSpan.FromMinutes(1),
+                        TablesPrefix = "Hangfire",
+                    }
+                )
+            ));
+
+        services.AddHangfireServer(options => options.WorkerCount = 1);
+
         services.AddAuthorization();
 
         services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
@@ -125,6 +150,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IExternalAuthCallbackService, ExternalAuthCallbackService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IResetVotesService, ResetVotesService>();
         return services;
     }
 }

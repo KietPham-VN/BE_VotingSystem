@@ -1,5 +1,6 @@
 using BE_VotingSystem.Api.Middlewares;
 using BE_VotingSystem.Infrastructure;
+using BE_VotingSystem.Infrastructure.Extensions;
 using BE_VotingSystem.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -39,18 +40,17 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
+// Tắt debug log cho authentication
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Warning);
 
 _ = builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
+
 // Setup recurring jobs
-using (var scope = app.Services.CreateScope())
-{
-    var recurringJobService = scope.ServiceProvider.GetRequiredService<IRecurringJobService>();
-    recurringJobService.SetupAllRecurringJobs();
-}
+app.Services.RegisterRecurringJobs();
+
 
 if (app.Environment.IsDevelopment())
 {
