@@ -32,6 +32,8 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
 
         builder.Property(a => a.Name).HasMaxLength(255);
 
+        builder.Property(a => a.VotesRemain).HasDefaultValue(3).IsRequired();
+
         builder.Property(a => a.Provider)
             .HasConversion<string>()
             .HasMaxLength(50)

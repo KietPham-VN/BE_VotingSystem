@@ -10,8 +10,9 @@ public class Account
     public string? StudentCode { get; set; }
     public byte? Semester { get; set; }
 
+    public byte VotesRemain { get; set; } = 3;
     public string? Department { get; set; }
-    public bool IsAdmin { get; set; } = false;
+    public bool IsAdmin { get; set; }
     public AuthProvider Provider { get; set; }
     public string? ProviderId { get; set; }
 

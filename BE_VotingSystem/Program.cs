@@ -1,7 +1,9 @@
 using BE_VotingSystem.Api.Middlewares;
 using BE_VotingSystem.Infrastructure;
+using BE_VotingSystem.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,19 +28,29 @@ builder.Services.AddSwaggerGen(c =>
 
     var securityRequirement = new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() }
+        {
+            new OpenApiSecurityScheme
+                { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
+            Array.Empty<string>()
+        }
     };
     c.AddSecurityRequirement(securityRequirement);
 });
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 
-// Thêm logging chi tiết cho debug
 builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 
 _ = builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+// Setup recurring jobs
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobService = scope.ServiceProvider.GetRequiredService<IRecurringJobService>();
+    recurringJobService.SetupAllRecurringJobs();
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -46,19 +58,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// ✅ Sắp xếp lại thứ tự middleware
 app.UseHttpsRedirection();
 
-// Cookie policy trước authentication
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.Lax,
     Secure = CookieSecurePolicy.SameAsRequest // Quan trọng cho localhost
 });
 
-// Authentication middleware
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRouting();
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = [new HangfireAuthorizationFilter()],
+    IgnoreAntiforgeryToken = true
+});
 
 // Global exception middleware sau authentication để có thể access user context
 app.UseMiddleware<GlobalExceptionMiddleware>();
