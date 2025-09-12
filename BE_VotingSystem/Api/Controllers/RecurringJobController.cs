@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
-using Hangfire;
 using BE_VotingSystem.Infrastructure.Extensions;
+using Hangfire;
 
 namespace BE_VotingSystem.Api.Controllers;
 

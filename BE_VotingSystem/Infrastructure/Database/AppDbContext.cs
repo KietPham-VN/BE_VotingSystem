@@ -1,6 +1,5 @@
 ﻿using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BE_VotingSystem.Infrastructure.Database;
 

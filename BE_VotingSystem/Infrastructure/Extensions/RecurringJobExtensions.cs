@@ -1,5 +1,5 @@
-using Hangfire;
 using BE_VotingSystem.Infrastructure.Services;
+using Hangfire;
 
 namespace BE_VotingSystem.Infrastructure.Extensions;
 
@@ -9,7 +9,7 @@ public static class RecurringJobExtensions
     {
         using var scope = serviceProvider.CreateScope();
         var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-        
+
         // Register reset votes remain job - chạy hàng ngày lúc 24h
         recurringJobManager.AddOrUpdate<IResetVotesService>(
             "reset-votes-remain",
