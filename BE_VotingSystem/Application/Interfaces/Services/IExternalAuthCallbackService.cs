@@ -1,5 +1,4 @@
 using BE_VotingSystem.Application.Dtos.Auth;
-using Microsoft.AspNetCore.Http;
 
 namespace BE_VotingSystem.Application.Interfaces.Services;
 

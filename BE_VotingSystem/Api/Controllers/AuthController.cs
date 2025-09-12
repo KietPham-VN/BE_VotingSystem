@@ -1,7 +1,6 @@
 ﻿using BE_VotingSystem.Application.Dtos.Auth;
 using BE_VotingSystem.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
@@ -40,6 +39,4 @@ public class AuthController(IAuthService authService) : ControllerBase
         if (result is null) return Unauthorized();
         return Ok(result);
     }
-
-    
 }

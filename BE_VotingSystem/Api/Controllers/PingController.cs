@@ -1,12 +1,11 @@
 ﻿using BE_VotingSystem.Application.Dtos.PingDTO;
-using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PingController :  ControllerBase
+public class PingController : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(PingResponse), StatusCodes.Status200OK)]

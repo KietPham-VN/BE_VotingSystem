@@ -54,24 +54,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.Lax,
     Secure = CookieSecurePolicy.SameAsRequest // Quan trọng cho localhost
 });
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseRouting();
-
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = [new HangfireAuthorizationFilter()],
     IgnoreAntiforgeryToken = true
 });
-
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.MapControllers();

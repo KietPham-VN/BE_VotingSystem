@@ -54,7 +54,6 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
             .HasMaxLength(255)
             .IsRequired(false);
 
-
         builder.Property(a => a.IsAdmin)
             .HasDefaultValue(false)
             .IsRequired();
