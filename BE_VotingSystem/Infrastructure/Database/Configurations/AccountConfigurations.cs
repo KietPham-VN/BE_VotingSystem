@@ -58,6 +58,14 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
             .HasDefaultValue(false)
             .IsRequired();
 
+        builder.Property(a => a.IsBanned)
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        builder.Property(a => a.BanReason)
+            .HasMaxLength(500)
+            .IsRequired(false);
+
         builder.Property(a => a.PasswordHash)
             .HasMaxLength(255);
 

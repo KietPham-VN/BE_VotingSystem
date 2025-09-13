@@ -7,10 +7,10 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace BE_VotingSystem.Api.Controllers;
 
 [ApiController]
-[Route("api/google-auth")]
+[Route("api/google-auth/external")]
 public class GoogleAuthController(IExternalAuthCallbackService externalCallbackService) : ControllerBase
 {
-    [HttpGet("external/google")]
+    [HttpGet("google")]
     [AllowAnonymous]
     [SwaggerOperation(
         Summary = "Start Google OAuth",
@@ -25,7 +25,7 @@ public class GoogleAuthController(IExternalAuthCallbackService externalCallbackS
         return Challenge(props, "Google");
     }
 
-    [HttpGet("external/google-callback")]
+    [HttpGet("google-callback")]
     [AllowAnonymous]
     [SwaggerOperation(
         Summary = "Google OAuth callback",
