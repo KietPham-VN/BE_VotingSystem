@@ -25,13 +25,10 @@ public class LectureVoteConfiguration : IEntityTypeConfiguration<LectureVote>
 
         builder.Property(lv => lv.VotedAt)
             .IsRequired()
-            .HasDefaultValueSql("NOW(6)");
-        builder.HasIndex(lv => lv.VotedAt);
+            .HasDefaultValueSql("CURDATE()")
+            .HasColumnType("DATE");
 
-        // Computed column for date only (without time)
-        builder.Property(lv => lv.VotedDate)
-            .HasComputedColumnSql("DATE(VotedAt)")
-            .IsRequired();
+        builder.HasIndex(lv => lv.VotedAt);
 
         // Foreign key relationships
         builder
@@ -48,7 +45,7 @@ public class LectureVoteConfiguration : IEntityTypeConfiguration<LectureVote>
 
         // Unique constraint để ngăn vote trùng lặp trong cùng 1 ngày
         // Cho phép vote lại cho cùng 1 lecture vào ngày khác
-        builder.HasIndex(lv => new { lv.LectureId, lv.AccountId, lv.VotedDate })
+        builder.HasIndex(lv => new { lv.LectureId, lv.AccountId, lv.VotedAt })
             .IsUnique();
     }
 }

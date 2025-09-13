@@ -9,6 +9,5 @@ public class LectureVote
     public Guid AccountId { get; set; }
     public Account? Account { get; set; }
 
-    public DateTime VotedAt { get; set; } = DateTime.UtcNow;
-    public DateOnly VotedDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    public DateOnly VotedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 }

@@ -23,7 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IExternalAuthCallbackService, ExternalAuthCallbackService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IResetVotesService, ResetVotesService>();
-        services.AddScoped<ILectureService, LectureService>();
+        services.AddScoped<ILecturerService, LecturerService>();
         return services;
     }
 }

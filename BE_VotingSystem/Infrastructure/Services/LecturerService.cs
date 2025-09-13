@@ -1,32 +1,39 @@
-﻿using BE_VotingSystem.Application.Dtos.Lecture.Requests;
+﻿using BE_VotingSystem.Application.Dtos.Lecture;
+using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Domain.Entities;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
-public class LectureService(IAppDbContext context) : ILectureService
+public class LecturerService(IAppDbContext context) : ILecturerService
 {
-    public async Task<List<Lecture>> GetLectures(CancellationToken cancellationToken = default)
+    public async Task<List<LecturerDto>> GetLecturers(CancellationToken cancellationToken = default)
     {
         return await context.Lectures
             .AsNoTracking()
             .Include(l => l.Votes)
             .OrderBy(l => l.Name)
+            .Select(l => new LecturerDto(
+                l.Name ?? string.Empty,
+                l.Department ?? string.Empty,
+                l.Quote ?? string.Empty,
+                l.AvatarUrl ?? string.Empty,
+                l.Votes.Count
+            ))
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Lecture> AddLecture(CreateLecturerRequest request, CancellationToken cancellationToken = default)
+    public async Task<Lecture> AddLecturer(CreateLecturerRequest request, CancellationToken cancellationToken = default)
     {
         var existingLecture = await context.Lectures
-            .FirstOrDefaultAsync(l => l.Name.ToLower() == request.Name.ToLower(), cancellationToken);
+            .FirstOrDefaultAsync(l => l.Name!.ToLower() == request.Name.ToLower(), cancellationToken);
 
         if (existingLecture != null)
             throw new InvalidOperationException($"Lecture with name '{request.Name}' already exists");
 
         var lecture = new Lecture
         {
-            Id = Guid.NewGuid(),
             Name = request.Name.Trim(),
             Department = request.Department.Trim(),
             Quote = request.Quote?.Trim(),
@@ -39,7 +46,8 @@ public class LectureService(IAppDbContext context) : ILectureService
         return lecture;
     }
 
-    public async Task<Lecture> UpdateLecture(Guid id, CreateLecturerRequest request, CancellationToken cancellationToken = default)
+    public async Task<Lecture> UpdateLecturer(Guid id, CreateLecturerRequest request,
+        CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
@@ -49,7 +57,7 @@ public class LectureService(IAppDbContext context) : ILectureService
 
         // Check if another lecture with same name exists (excluding current one)
         var existingLecture = await context.Lectures
-            .FirstOrDefaultAsync(l => l.Name.ToLower() == request.Name.ToLower() && l.Id != id, cancellationToken);
+            .FirstOrDefaultAsync(l => l.Name!.ToLower() == request.Name.ToLower() && l.Id != id, cancellationToken);
 
         if (existingLecture != null)
             throw new InvalidOperationException($"Lecture with name '{request.Name}' already exists");
@@ -64,7 +72,7 @@ public class LectureService(IAppDbContext context) : ILectureService
         return lecture;
     }
 
-    public async Task DeleteLecture(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteLecturer(Guid id, CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);

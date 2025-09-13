@@ -23,7 +23,7 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
 
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Id)
-            .ValueGeneratedNever();
+            .ValueGeneratedOnAdd();
 
         builder.Property(a => a.Email)
             .IsRequired()

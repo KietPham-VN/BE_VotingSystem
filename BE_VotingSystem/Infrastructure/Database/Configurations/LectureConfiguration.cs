@@ -15,7 +15,7 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
             t.HasCheckConstraint(
                 "CK_Lecture_Name_NotEmpty",
                 "CHAR_LENGTH(TRIM(Name)) > 0");
-            
+
             t.HasCheckConstraint(
                 "CK_Lecture_Department_NotEmpty",
                 "CHAR_LENGTH(TRIM(Department)) > 0");
@@ -23,7 +23,7 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
 
         builder.HasKey(l => l.Id);
         builder.Property(l => l.Id)
-            .ValueGeneratedNever();
+            .ValueGeneratedOnAdd();
 
         builder.Property(l => l.Name)
             .IsRequired()

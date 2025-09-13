@@ -26,7 +26,7 @@ public class AuthService(
         var (refresh, refreshExp) = jwt.CreateRefreshToken();
 
         db.RefreshTokens.Add(new RefreshToken
-        { Id = Guid.NewGuid(), Token = refresh, Expires = refreshExp, AccountId = user.Id });
+            { Token = refresh, Expires = refreshExp, AccountId = user.Id });
         await db.SaveChangesAsync(ct);
 
         return new AuthResponse
@@ -46,7 +46,6 @@ public class AuthService(
         {
             user = new Account
             {
-                Id = Guid.NewGuid(),
                 Email = email,
                 Name = name,
                 Provider = AuthProvider.Google,
@@ -59,7 +58,7 @@ public class AuthService(
         var access = jwt.CreateAccessToken(user);
         var (refresh, refreshExp) = jwt.CreateRefreshToken();
         db.RefreshTokens.Add(new RefreshToken
-        { Id = Guid.NewGuid(), Token = refresh, Expires = refreshExp, AccountId = user.Id });
+            { Token = refresh, Expires = refreshExp, AccountId = user.Id });
         await db.SaveChangesAsync(ct);
         return new AuthResponse
         {
@@ -88,7 +87,7 @@ public class AuthService(
         // rotate token: delete old, insert new
         db.RefreshTokens.Remove(new RefreshToken { Id = tokenEntity.Id });
         db.RefreshTokens.Add(new RefreshToken
-        { Id = Guid.NewGuid(), Token = newRefresh, Expires = newRefreshExp, AccountId = user.Id });
+            { Token = newRefresh, Expires = newRefreshExp, AccountId = user.Id });
         await db.SaveChangesAsync(ct);
 
         return new AuthResponse
