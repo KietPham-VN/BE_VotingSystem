@@ -28,6 +28,11 @@ public interface IAppDbContext
     DbSet<LectureVote> LectureVotes { get; set; }
 
     /// <summary>
+    ///     Gets or sets the feedback votes DbSet
+    /// </summary>
+    DbSet<FeedbackVote> FeedbackVotes { get; set; }
+
+    /// <summary>
     ///     Saves all changes made in this context to the database
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>

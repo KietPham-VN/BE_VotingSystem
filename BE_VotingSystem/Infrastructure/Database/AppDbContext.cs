@@ -29,6 +29,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<LectureVote> LectureVotes { get; set; }
 
     /// <summary>
+    ///     Gets or sets the feedback votes DbSet
+    /// </summary>
+    public DbSet<FeedbackVote> FeedbackVotes { get; set; }
+
+    /// <summary>
     ///     Configures the model for the database context
     /// </summary>
     /// <param name="modelBuilder">The model builder</param>

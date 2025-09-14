@@ -81,4 +81,9 @@ public class Account
     ///     Collection of votes cast by this account
     /// </summary>
     public List<LectureVote> Votes { get; set; } = [];
+
+    /// <summary>
+    ///     navigation property
+    /// </summary>
+    public FeedbackVote? FeedbackVote { get; set; }
 }
