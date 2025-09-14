@@ -4,12 +4,12 @@ using FluentValidation;
 namespace BE_VotingSystem.Api.DTOValidators;
 
 /// <summary>
-/// Validator for UpdateAccountRequest DTO
+///     Validator for UpdateAccountRequest DTO
 /// </summary>
 public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the UpdateAccountRequestValidator class
+    ///     Initializes a new instance of the UpdateAccountRequestValidator class
     /// </summary>
     public UpdateAccountRequestValidator()
     {

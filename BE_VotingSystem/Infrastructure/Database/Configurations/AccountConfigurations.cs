@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
 /// <summary>
-/// Entity Framework configuration for Account entity
+///     Entity Framework configuration for Account entity
 /// </summary>
 public class AccountConfigurations : IEntityTypeConfiguration<Account>
 {
     /// <summary>
-    /// Configures the Account entity for Entity Framework
+    ///     Configures the Account entity for Entity Framework
     /// </summary>
     /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",

@@ -6,14 +6,14 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace BE_VotingSystem.Api.Controllers;
 
 /// <summary>
-/// Controller for authentication operations
+///     Controller for authentication operations
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     /// <summary>
-    /// Refreshes access token using refresh token
+    ///     Refreshes access token using refresh token
     /// </summary>
     /// <param name="req">Refresh token request</param>
     /// <param name="ct">Cancellation token</param>
@@ -34,7 +34,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     /// <summary>
-    /// Authenticates user with email and password
+    ///     Authenticates user with email and password
     /// </summary>
     /// <param name="req">Login request with email and password</param>
     /// <param name="ct">Cancellation token</param>

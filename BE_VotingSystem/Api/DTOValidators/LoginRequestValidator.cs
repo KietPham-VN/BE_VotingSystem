@@ -4,12 +4,12 @@ using FluentValidation;
 namespace BE_VotingSystem.Api.DTOValidators;
 
 /// <summary>
-/// Validator for LoginRequest DTO
+///     Validator for LoginRequest DTO
 /// </summary>
 public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the LoginRequestValidator class
+    ///     Initializes a new instance of the LoginRequestValidator class
     /// </summary>
     public LoginRequestValidator()
     {

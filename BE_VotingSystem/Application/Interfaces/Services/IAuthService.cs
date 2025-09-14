@@ -3,12 +3,12 @@
 namespace BE_VotingSystem.Application.Interfaces.Services;
 
 /// <summary>
-/// Service interface for authentication operations
+///     Service interface for authentication operations
 /// </summary>
 public interface IAuthService
 {
     /// <summary>
-    /// Authenticates a user with email and password
+    ///     Authenticates a user with email and password
     /// </summary>
     /// <param name="req">Login request containing email and password</param>
     /// <param name="ct">Cancellation token</param>
@@ -16,7 +16,7 @@ public interface IAuthService
     Task<AuthResponse?> LoginAsync(LoginRequest req, CancellationToken ct);
 
     /// <summary>
-    /// Authenticates a user through external provider (e.g., Google)
+    ///     Authenticates a user through external provider (e.g., Google)
     /// </summary>
     /// <param name="provider">External authentication provider</param>
     /// <param name="providerId">User ID from the external provider</param>
@@ -28,7 +28,7 @@ public interface IAuthService
         CancellationToken ct);
 
     /// <summary>
-    /// Refreshes an access token using a refresh token
+    ///     Refreshes an access token using a refresh token
     /// </summary>
     /// <param name="refreshToken">Refresh token to exchange for new access token</param>
     /// <param name="ct">Cancellation token</param>

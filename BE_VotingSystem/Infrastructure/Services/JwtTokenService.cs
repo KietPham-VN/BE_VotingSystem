@@ -11,14 +11,14 @@ using Microsoft.IdentityModel.Tokens;
 namespace BE_VotingSystem.Infrastructure.Services;
 
 /// <summary>
-/// Service implementation for JWT token operations
+///     Service implementation for JWT token operations
 /// </summary>
 public class JwtTokenService(IOptions<JwtSettings> options) : IJwtTokenService
 {
     private readonly JwtSettings _settings = options.Value;
 
     /// <summary>
-    /// Creates a JWT access token for the specified account
+    ///     Creates a JWT access token for the specified account
     /// </summary>
     /// <param name="account">The account to create the token for</param>
     /// <returns>The JWT access token as a string</returns>
@@ -45,7 +45,7 @@ public class JwtTokenService(IOptions<JwtSettings> options) : IJwtTokenService
     }
 
     /// <summary>
-    /// Creates a refresh token with expiration date
+    ///     Creates a refresh token with expiration date
     /// </summary>
     /// <returns>A tuple containing the refresh token and its expiration date</returns>
     public (string token, DateTime expiresAt) CreateRefreshToken()

@@ -1,7 +1,7 @@
 ﻿namespace BE_VotingSystem.Application.Dtos.Lecture.Requests;
 
 /// <summary>
-/// Request object for creating a new lecturer
+///     Request object for creating a new lecturer
 /// </summary>
 /// <param name="Name">Full name of the lecturer</param>
 /// <param name="Department">Department the lecturer belongs to</param>

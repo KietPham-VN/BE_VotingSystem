@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
 /// <summary>
-/// Entity Framework configuration for Lecture entity
+///     Entity Framework configuration for Lecture entity
 /// </summary>
 public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
 {
     /// <summary>
-    /// Configures the Lecture entity for Entity Framework
+    ///     Configures the Lecture entity for Entity Framework
     /// </summary>
     /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",
@@ -45,6 +45,9 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
         builder.Property(l => l.Quote)
             .HasMaxLength(1000)
             .IsRequired(false);
+
+        builder.Property(l => l.IsActive)
+            .IsRequired();
 
         builder.Property(l => l.AvatarUrl)
             .HasMaxLength(500)

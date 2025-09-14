@@ -4,12 +4,12 @@ using FluentValidation;
 namespace BE_VotingSystem.Api.DTOValidators;
 
 /// <summary>
-/// Validator for BanAccountRequest DTO
+///     Validator for BanAccountRequest DTO
 /// </summary>
 public class BanAccountRequestValidator : AbstractValidator<BanAccountRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the BanAccountRequestValidator class
+    ///     Initializes a new instance of the BanAccountRequestValidator class
     /// </summary>
     public BanAccountRequestValidator()
     {

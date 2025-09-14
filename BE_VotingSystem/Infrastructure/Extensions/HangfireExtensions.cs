@@ -5,17 +5,18 @@ using Hangfire.MySql;
 namespace BE_VotingSystem.Infrastructure.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring Hangfire background job services
+///     Provides extension methods for configuring Hangfire background job services
 /// </summary>
 public static class HangfireExtensions
 {
     /// <summary>
-    /// Adds Hangfire configuration to the service collection
+    ///     Adds Hangfire configuration to the service collection
     /// </summary>
     /// <param name="services">The service collection to add services to</param>
     /// <param name="configuration">The application configuration</param>
     /// <returns>The service collection for chaining</returns>
-    public static IServiceCollection AddHangfireConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddHangfireConfiguration(this IServiceCollection services,
+        IConfiguration configuration)
     {
         var dbSettings = configuration
             .GetSection(DatabaseSettings.SectionName)
@@ -40,7 +41,7 @@ public static class HangfireExtensions
                         PrepareSchemaIfNecessary = true,
                         DashboardJobListLimit = 25000,
                         TransactionTimeout = TimeSpan.FromMinutes(1),
-                        TablesPrefix = "Hangfire",
+                        TablesPrefix = "Hangfire"
                     }
                 )
             ));

@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace BE_VotingSystem.Api.Controllers;
 
 /// <summary>
-/// Controller for managing user accounts
+///     Controller for managing user accounts
 /// </summary>
 [Authorize]
 [ApiController]
@@ -14,7 +14,7 @@ namespace BE_VotingSystem.Api.Controllers;
 public class AccountController(IAccountService accountService) : ControllerBase
 {
     /// <summary>
-    /// Gets all accounts
+    ///     Gets all accounts
     /// </summary>
     /// <param name="ct">Cancellation token</param>
     /// <returns>List of all accounts</returns>
@@ -28,7 +28,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     /// <summary>
-    /// Gets an account by ID
+    ///     Gets an account by ID
     /// </summary>
     /// <param name="id">Account ID</param>
     /// <returns>Account details or 404 if not found</returns>
@@ -46,7 +46,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     /// <summary>
-    /// Update an account
+    ///     Update an account
     /// </summary>
     /// <param name="id">Account ID</param>
     /// <param name="request">Update request</param>
@@ -71,7 +71,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     /// <summary>
-    /// Delete an account
+    ///     Delete an account
     /// </summary>
     /// <param name="id">Account ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -94,7 +94,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     /// <summary>
-    /// Ban or unban an account
+    ///     Ban or unban an account
     /// </summary>
     /// <param name="id">Account ID</param>
     /// <param name="request">Ban request</param>

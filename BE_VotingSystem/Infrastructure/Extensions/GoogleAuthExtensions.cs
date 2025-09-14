@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 namespace BE_VotingSystem.Infrastructure.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring Google authentication services
+///     Provides extension methods for configuring Google authentication services
 /// </summary>
 public static class GoogleAuthExtensions
 {
     /// <summary>
-    /// Configures Google OAuth authentication with the provided configuration
+    ///     Configures Google OAuth authentication with the provided configuration
     /// </summary>
     /// <param name="authBuilder">The authentication builder</param>
     /// <param name="configuration">The application configuration</param>
@@ -80,7 +80,7 @@ public static class GoogleAuthExtensions
     }
 
     /// <summary>
-    /// Adds Google authentication configuration to the service collection
+    ///     Adds Google authentication configuration to the service collection
     /// </summary>
     /// <param name="services">The service collection to add services to</param>
     /// <param name="configuration">The application configuration</param>

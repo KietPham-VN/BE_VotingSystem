@@ -7,12 +7,12 @@ using BE_VotingSystem.Domain.Entities;
 namespace BE_VotingSystem.Infrastructure.Services;
 
 /// <summary>
-/// Service implementation for lecturer management operations
+///     Service implementation for lecturer management operations
 /// </summary>
 public class LecturerService(IAppDbContext context) : ILecturerService
 {
     /// <summary>
-    /// Gets all lecturers with their vote counts
+    ///     Gets all lecturers with their vote counts
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A list of lecturer DTOs ordered by name</returns>
@@ -34,7 +34,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     }
 
     /// <summary>
-    /// Adds a new lecturer
+    ///     Adds a new lecturer
     /// </summary>
     /// <param name="request">The create lecturer request containing lecturer information</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -63,13 +63,16 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     }
 
     /// <summary>
-    /// Updates an existing lecturer
+    ///     Updates an existing lecturer
     /// </summary>
     /// <param name="id">The lecturer identifier</param>
     /// <param name="request">The create lecturer request containing updated information</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The updated lecture entity</returns>
-    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found or another lecturer with the same name exists</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when lecturer is not found or another lecturer with the same name
+    ///     exists
+    /// </exception>
     public async Task<Lecture> UpdateLecturer(Guid id, CreateLecturerRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -97,7 +100,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     }
 
     /// <summary>
-    /// Deletes a lecturer by its unique identifier
+    ///     Deletes a lecturer by its unique identifier
     /// </summary>
     /// <param name="id">The lecturer identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>

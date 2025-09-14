@@ -4,32 +4,32 @@ using BE_VotingSystem.Domain.Entities;
 namespace BE_VotingSystem.Infrastructure.Database;
 
 /// <summary>
-/// Entity Framework database context for the voting system
+///     Entity Framework database context for the voting system
 /// </summary>
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options), IAppDbContext
 {
     /// <summary>
-    /// Gets or sets the accounts DbSet
+    ///     Gets or sets the accounts DbSet
     /// </summary>
     public DbSet<Account> Accounts { get; set; }
-    
+
     /// <summary>
-    /// Gets or sets the refresh tokens DbSet
+    ///     Gets or sets the refresh tokens DbSet
     /// </summary>
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-    
+
     /// <summary>
-    /// Gets or sets the lectures DbSet
+    ///     Gets or sets the lectures DbSet
     /// </summary>
     public DbSet<Lecture> Lectures { get; set; }
-    
+
     /// <summary>
-    /// Gets or sets the lecture votes DbSet
+    ///     Gets or sets the lecture votes DbSet
     /// </summary>
     public DbSet<LectureVote> LectureVotes { get; set; }
 
     /// <summary>
-    /// Configures the model for the database context
+    ///     Configures the model for the database context
     /// </summary>
     /// <param name="modelBuilder">The model builder</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)

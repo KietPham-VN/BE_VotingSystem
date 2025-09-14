@@ -5,10 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <WarningLevel>5</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarningsAsErrors />
-        <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+        <WarningsAsErrors/>
     </PropertyGroup>
 
     <ItemGroup>

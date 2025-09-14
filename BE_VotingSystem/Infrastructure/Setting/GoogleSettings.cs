@@ -1,27 +1,27 @@
 ﻿namespace BE_VotingSystem.Infrastructure.Setting;
 
 /// <summary>
-/// Configuration settings for Google OAuth authentication
+///     Configuration settings for Google OAuth authentication
 /// </summary>
 public sealed class GoogleSettings
 {
     /// <summary>
-    /// Configuration section name for Google settings
+    ///     Configuration section name for Google settings
     /// </summary>
     public const string SectionName = "Authentication:Google";
-    
+
     /// <summary>
-    /// Google OAuth client ID
+    ///     Google OAuth client ID
     /// </summary>
     public string ClientId { get; init; } = null!;
-    
+
     /// <summary>
-    /// Google OAuth client secret
+    ///     Google OAuth client secret
     /// </summary>
     public string ClientSecret { get; init; } = null!;
-    
+
     /// <summary>
-    /// OAuth callback path
+    ///     OAuth callback path
     /// </summary>
     public string CallbackPath { get; init; } = "/signin-google";
 }

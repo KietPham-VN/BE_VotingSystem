@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 namespace BE_VotingSystem.Infrastructure.Services;
 
 /// <summary>
-/// Service implementation for authentication operations
+///     Service implementation for authentication operations
 /// </summary>
 public class AuthService(
     IAppDbContext db,
@@ -18,7 +18,7 @@ public class AuthService(
     : IAuthService
 {
     /// <summary>
-    /// Authenticates a user with email and password
+    ///     Authenticates a user with email and password
     /// </summary>
     /// <param name="req">The login request containing email and password</param>
     /// <param name="ct">Cancellation token</param>
@@ -48,7 +48,7 @@ public class AuthService(
     }
 
     /// <summary>
-    /// Authenticates a user with external provider (Google, etc.)
+    ///     Authenticates a user with external provider (Google, etc.)
     /// </summary>
     /// <param name="provider">The external provider name</param>
     /// <param name="providerId">The user's ID from the external provider</param>
@@ -88,7 +88,7 @@ public class AuthService(
     }
 
     /// <summary>
-    /// Refreshes an access token using a valid refresh token
+    ///     Refreshes an access token using a valid refresh token
     /// </summary>
     /// <param name="refreshToken">The refresh token to use for generating new tokens</param>
     /// <param name="ct">Cancellation token</param>

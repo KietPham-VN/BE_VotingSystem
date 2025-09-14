@@ -1,7 +1,7 @@
 ﻿namespace BE_VotingSystem.Application.Dtos.Lecture;
 
 /// <summary>
-/// Data transfer object for lecturer information
+///     Data transfer object for lecturer information
 /// </summary>
 /// <param name="Id">Unique identifier for the lecturer</param>
 /// <param name="Name">Full name of the lecturer</param>

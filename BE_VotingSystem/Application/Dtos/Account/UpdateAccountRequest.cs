@@ -1,7 +1,7 @@
 namespace BE_VotingSystem.Application.Dtos.Account;
 
 /// <summary>
-/// Request object for updating account information
+///     Request object for updating account information
 /// </summary>
 /// <param name="Name">Updated name (optional)</param>
 /// <param name="StudentCode">Updated student code (optional)</param>

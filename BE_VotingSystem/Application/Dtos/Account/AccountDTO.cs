@@ -1,7 +1,7 @@
 ﻿namespace BE_VotingSystem.Application.Dtos.Account;
 
 /// <summary>
-/// Data transfer object for account information
+///     Data transfer object for account information
 /// </summary>
 /// <param name="StudentCode">Student code identifier</param>
 /// <param name="Email">Account email address</param>

@@ -4,14 +4,14 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace BE_VotingSystem.Api.Controllers;
 
 /// <summary>
-/// Controller for health check and ping operations
+///     Controller for health check and ping operations
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class PingController : ControllerBase
 {
     /// <summary>
-    /// Health check endpoint that returns pong with current time
+    ///     Health check endpoint that returns pong with current time
     /// </summary>
     /// <returns>Ping response with current UTC time</returns>
     [HttpGet]

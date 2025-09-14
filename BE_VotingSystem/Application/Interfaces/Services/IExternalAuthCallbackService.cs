@@ -3,12 +3,12 @@ using BE_VotingSystem.Application.Dtos.Auth;
 namespace BE_VotingSystem.Application.Interfaces.Services;
 
 /// <summary>
-/// Service interface for handling external authentication callbacks
+///     Service interface for handling external authentication callbacks
 /// </summary>
 public interface IExternalAuthCallbackService
 {
     /// <summary>
-    /// Handles Google OAuth callback and processes the authentication result
+    ///     Handles Google OAuth callback and processes the authentication result
     /// </summary>
     /// <param name="httpContext">HTTP context containing authentication information</param>
     /// <param name="redirectUri">Optional redirect URI after successful authentication</param>

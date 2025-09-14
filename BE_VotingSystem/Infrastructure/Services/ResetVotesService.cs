@@ -3,24 +3,24 @@ using BE_VotingSystem.Application.Interfaces;
 namespace BE_VotingSystem.Infrastructure.Services;
 
 /// <summary>
-/// Interface for resetting votes remain functionality
+///     Interface for resetting votes remain functionality
 /// </summary>
 public interface IResetVotesService
 {
     /// <summary>
-    /// Resets votes remain for all accounts to the default value
+    ///     Resets votes remain for all accounts to the default value
     /// </summary>
     /// <returns>A task representing the asynchronous operation</returns>
     Task ResetVotesRemainAsync();
 }
 
 /// <summary>
-/// Service implementation for resetting votes remain functionality
+///     Service implementation for resetting votes remain functionality
 /// </summary>
 public class ResetVotesService(IAppDbContext dbContext) : IResetVotesService
 {
     /// <summary>
-    /// Resets votes remain for all accounts to the default value (3)
+    ///     Resets votes remain for all accounts to the default value (3)
     /// </summary>
     /// <returns>A task representing the asynchronous operation</returns>
     public async Task ResetVotesRemainAsync()

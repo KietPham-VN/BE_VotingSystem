@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
 /// <summary>
-/// Entity Framework configuration for LectureVote entity
+///     Entity Framework configuration for LectureVote entity
 /// </summary>
 public class LectureVoteConfiguration : IEntityTypeConfiguration<LectureVote>
 {
     /// <summary>
-    /// Configures the LectureVote entity for Entity Framework
+    ///     Configures the LectureVote entity for Entity Framework
     /// </summary>
     /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",
