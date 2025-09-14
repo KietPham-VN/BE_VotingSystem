@@ -74,5 +74,11 @@ public class AccountConfigurations : IEntityTypeConfiguration<Account>
             .WithOne(rt => rt.Account)
             .HasForeignKey(rt => rt.AccountId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(a => a.Votes)
+            .WithOne(lv => lv.Account)
+            .HasForeignKey(lv => lv.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -15,6 +15,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .Include(l => l.Votes)
             .OrderBy(l => l.Name)
             .Select(l => new LecturerDto(
+                l.Id,
                 l.Name ?? string.Empty,
                 l.Department ?? string.Empty,
                 l.Quote ?? string.Empty,
