@@ -3,8 +3,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
+/// <summary>
+/// Entity Framework configuration for RefreshToken entity
+/// </summary>
 public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
+    /// <summary>
+    /// Configures the RefreshToken entity for Entity Framework
+    /// </summary>
+    /// <param name="builder">The entity type builder</param>
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
         builder.ToTable("refresh_token");

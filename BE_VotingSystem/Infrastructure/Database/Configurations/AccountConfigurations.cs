@@ -4,8 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
+/// <summary>
+/// Entity Framework configuration for Account entity
+/// </summary>
 public class AccountConfigurations : IEntityTypeConfiguration<Account>
 {
+    /// <summary>
+    /// Configures the Account entity for Entity Framework
+    /// </summary>
+    /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",
         Justification = "EF Core requires instance method for IEntityTypeConfiguration<T>.")]
     public void Configure(EntityTypeBuilder<Account> builder)

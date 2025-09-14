@@ -5,11 +5,19 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 
+/// <summary>
+/// Controller for managing user accounts
+/// </summary>
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AccountController(IAccountService accountService) : ControllerBase
 {
+    /// <summary>
+    /// Gets all accounts
+    /// </summary>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>List of all accounts</returns>
     [HttpGet]
     [SwaggerOperation(Summary = "List all accounts", Description = "Returns 200 with all accounts")]
     [ProducesResponseType(typeof(IEnumerable<AccountDto>), StatusCodes.Status200OK)]
@@ -19,6 +27,11 @@ public class AccountController(IAccountService accountService) : ControllerBase
         return Ok(accounts);
     }
 
+    /// <summary>
+    /// Gets an account by ID
+    /// </summary>
+    /// <param name="id">Account ID</param>
+    /// <returns>Account details or 404 if not found</returns>
     [HttpGet("{id:guid}")]
     [SwaggerOperation(Summary = "Get account by id", Description = "Returns 200 with account or 404 if not found")]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]

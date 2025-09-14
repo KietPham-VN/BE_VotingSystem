@@ -6,10 +6,18 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 
+/// <summary>
+/// Controller for Google OAuth authentication
+/// </summary>
 [ApiController]
 [Route("api/google-auth/external")]
 public class GoogleAuthController(IExternalAuthCallbackService externalCallbackService) : ControllerBase
 {
+    /// <summary>
+    /// Initiates Google OAuth flow
+    /// </summary>
+    /// <param name="redirectUri">Optional redirect URI after authentication</param>
+    /// <returns>Redirect to Google OAuth consent screen</returns>
     [HttpGet("google")]
     [AllowAnonymous]
     [SwaggerOperation(
@@ -25,6 +33,12 @@ public class GoogleAuthController(IExternalAuthCallbackService externalCallbackS
         return Challenge(props, "Google");
     }
 
+    /// <summary>
+    /// Handles Google OAuth callback
+    /// </summary>
+    /// <param name="redirectUri">Optional redirect URI after authentication</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>Authentication response or redirect</returns>
     [HttpGet("google-callback")]
     [AllowAnonymous]
     [SwaggerOperation(

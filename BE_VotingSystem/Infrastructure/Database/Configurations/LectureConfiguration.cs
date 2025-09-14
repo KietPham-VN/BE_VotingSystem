@@ -4,8 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
+/// <summary>
+/// Entity Framework configuration for Lecture entity
+/// </summary>
 public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
 {
+    /// <summary>
+    /// Configures the Lecture entity for Entity Framework
+    /// </summary>
+    /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",
         Justification = "EF Core requires instance method for IEntityTypeConfiguration<T>.")]
     public void Configure(EntityTypeBuilder<Lecture> builder)

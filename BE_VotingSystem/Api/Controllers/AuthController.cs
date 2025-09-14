@@ -5,10 +5,19 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 
+/// <summary>
+/// Controller for authentication operations
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
+    /// <summary>
+    /// Refreshes access token using refresh token
+    /// </summary>
+    /// <param name="req">Refresh token request</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>New access and refresh tokens</returns>
     [HttpPost("refresh")]
     [AllowAnonymous]
     [SwaggerOperation(
@@ -24,6 +33,12 @@ public class AuthController(IAuthService authService) : ControllerBase
         return Ok(tokens);
     }
 
+    /// <summary>
+    /// Authenticates user with email and password
+    /// </summary>
+    /// <param name="req">Login request with email and password</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>Access and refresh tokens on successful authentication</returns>
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]

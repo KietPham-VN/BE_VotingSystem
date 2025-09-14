@@ -5,8 +5,18 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
+/// <summary>
+/// Service for handling external authentication callbacks
+/// </summary>
 public class ExternalAuthCallbackService(IAuthService authService) : IExternalAuthCallbackService
 {
+    /// <summary>
+    /// Handles Google OAuth callback and returns authentication tokens
+    /// </summary>
+    /// <param name="httpContext">The HTTP context containing authentication information</param>
+    /// <param name="redirectUri">The redirect URI to return to after authentication</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>A tuple containing authentication response and redirect URL</returns>
     public async Task<(AuthResponse? tokens, string? redirectUrl)> HandleGoogleCallbackAsync(
         HttpContext httpContext,
         string? redirectUri,

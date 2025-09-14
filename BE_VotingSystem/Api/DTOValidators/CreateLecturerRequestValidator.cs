@@ -3,8 +3,14 @@ using FluentValidation;
 
 namespace BE_VotingSystem.Api.DTOValidators;
 
+/// <summary>
+/// Validator for CreateLecturerRequest DTO
+/// </summary>
 public class CreateLecturerRequestValidator : AbstractValidator<CreateLecturerRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of the CreateLecturerRequestValidator class
+    /// </summary>
     public CreateLecturerRequestValidator()
     {
         RuleFor(x => x.Name)
@@ -27,6 +33,11 @@ public class CreateLecturerRequestValidator : AbstractValidator<CreateLecturerRe
             .When(x => !string.IsNullOrEmpty(x.AvatarUrl));
     }
 
+    /// <summary>
+    /// Validates if the provided string is a valid URL
+    /// </summary>
+    /// <param name="url">URL string to validate</param>
+    /// <returns>True if valid URL, false otherwise</returns>
     private static bool BeValidUrl(string? url)
     {
         if (string.IsNullOrEmpty(url))

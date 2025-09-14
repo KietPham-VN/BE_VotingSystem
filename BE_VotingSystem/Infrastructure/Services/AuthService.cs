@@ -8,12 +8,21 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
+/// <summary>
+/// Service implementation for authentication operations
+/// </summary>
 public class AuthService(
     IAppDbContext db,
     IPasswordHasher<Account> hasher,
     IJwtTokenService jwt)
     : IAuthService
 {
+    /// <summary>
+    /// Authenticates a user with email and password
+    /// </summary>
+    /// <param name="req">The login request containing email and password</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>Authentication response with tokens if successful, otherwise null</returns>
     public async Task<AuthResponse?> LoginAsync(LoginRequest req, CancellationToken ct)
     {
         var user = await db.Accounts.FirstOrDefaultAsync(x => x.Email == req.Email, ct);
@@ -38,6 +47,15 @@ public class AuthService(
         };
     }
 
+    /// <summary>
+    /// Authenticates a user with external provider (Google, etc.)
+    /// </summary>
+    /// <param name="provider">The external provider name</param>
+    /// <param name="providerId">The user's ID from the external provider</param>
+    /// <param name="email">The user's email address</param>
+    /// <param name="name">The user's display name</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>Authentication response with tokens if successful, otherwise null</returns>
     public async Task<AuthResponse?> LoginExternalAsync(string provider, string providerId, string email, string name,
         CancellationToken ct)
     {
@@ -69,6 +87,12 @@ public class AuthService(
         };
     }
 
+    /// <summary>
+    /// Refreshes an access token using a valid refresh token
+    /// </summary>
+    /// <param name="refreshToken">The refresh token to use for generating new tokens</param>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>New authentication response with tokens if successful, otherwise null</returns>
     public async Task<AuthResponse?> RefreshAsync(string refreshToken, CancellationToken ct)
     {
         var tokenEntity = await db.RefreshTokens

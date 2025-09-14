@@ -3,8 +3,16 @@ using BE_VotingSystem.Domain.Exceptions;
 
 namespace BE_VotingSystem.Api.Middlewares;
 
+/// <summary>
+/// Global exception handling middleware for the application
+/// </summary>
 public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
 {
+    /// <summary>
+    /// Invokes the middleware to handle exceptions
+    /// </summary>
+    /// <param name="context">The HTTP context</param>
+    /// <returns>A task representing the asynchronous operation</returns>
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -35,6 +43,15 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         }
     }
 
+    /// <summary>
+    /// Writes problem details to the HTTP response
+    /// </summary>
+    /// <param name="context">The HTTP context</param>
+    /// <param name="statusCode">The HTTP status code</param>
+    /// <param name="title">The problem title</param>
+    /// <param name="detail">The problem detail</param>
+    /// <param name="errors">Optional validation errors</param>
+    /// <returns>A task representing the asynchronous operation</returns>
     private static async Task WriteProblemDetailsAsync(HttpContext context, int statusCode, string title, string detail, IDictionary<string, string[]>? errors = null)
     {
         context.Response.StatusCode = statusCode;

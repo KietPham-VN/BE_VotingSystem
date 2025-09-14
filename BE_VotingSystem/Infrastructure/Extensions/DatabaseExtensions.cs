@@ -4,8 +4,17 @@ using BE_VotingSystem.Infrastructure.Setting;
 
 namespace BE_VotingSystem.Infrastructure.Extensions;
 
+/// <summary>
+/// Provides extension methods for configuring database services
+/// </summary>
 public static class DatabaseExtensions
 {
+    /// <summary>
+    /// Adds database configuration to the service collection
+    /// </summary>
+    /// <param name="services">The service collection to add services to</param>
+    /// <param name="configuration">The application configuration</param>
+    /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services,
         IConfiguration configuration)
     {

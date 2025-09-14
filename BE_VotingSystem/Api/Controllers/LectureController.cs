@@ -7,6 +7,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 
+/// <summary>
+/// Controller for managing lectures/lecturers
+/// </summary>
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]

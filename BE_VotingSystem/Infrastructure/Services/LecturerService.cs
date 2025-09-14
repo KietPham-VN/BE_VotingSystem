@@ -6,8 +6,16 @@ using BE_VotingSystem.Domain.Entities;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
+/// <summary>
+/// Service implementation for lecturer management operations
+/// </summary>
 public class LecturerService(IAppDbContext context) : ILecturerService
 {
+    /// <summary>
+    /// Gets all lecturers with their vote counts
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>A list of lecturer DTOs ordered by name</returns>
     public async Task<List<LecturerDto>> GetLecturers(CancellationToken cancellationToken = default)
     {
         return await context.Lectures
@@ -25,6 +33,13 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Adds a new lecturer
+    /// </summary>
+    /// <param name="request">The create lecturer request containing lecturer information</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The created lecture entity</returns>
+    /// <exception cref="InvalidOperationException">Thrown when a lecturer with the same name already exists</exception>
     public async Task<Lecture> AddLecturer(CreateLecturerRequest request, CancellationToken cancellationToken = default)
     {
         var existingLecture = await context.Lectures
@@ -47,6 +62,14 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         return lecture;
     }
 
+    /// <summary>
+    /// Updates an existing lecturer
+    /// </summary>
+    /// <param name="id">The lecturer identifier</param>
+    /// <param name="request">The create lecturer request containing updated information</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The updated lecture entity</returns>
+    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found or another lecturer with the same name exists</exception>
     public async Task<Lecture> UpdateLecturer(Guid id, CreateLecturerRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -73,6 +96,12 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         return lecture;
     }
 
+    /// <summary>
+    /// Deletes a lecturer by its unique identifier
+    /// </summary>
+    /// <param name="id">The lecturer identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found</exception>
     public async Task DeleteLecturer(Guid id, CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures
