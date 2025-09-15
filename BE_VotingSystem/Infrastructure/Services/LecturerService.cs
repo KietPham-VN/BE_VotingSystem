@@ -11,20 +11,23 @@ namespace BE_VotingSystem.Infrastructure.Services;
 /// </summary>
 public class LecturerService(IAppDbContext context) : ILecturerService
 {
-    /// <summary>
-    ///     Gets all lecturers with their vote counts
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>A list of lecturer DTOs ordered by name</returns>
-    public async Task<List<LecturerDto>> GetLecturers(CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<List<LecturerDto>> GetLecturers(bool? isActive = null, CancellationToken cancellationToken = default)
     {
-        return await context.Lectures
+        var query = context.Lectures
             .AsNoTracking()
             .Include(l => l.Votes)
+            .AsQueryable();
+
+        if (isActive is not null)
+            query = query.Where(l => l.IsActive == isActive);
+
+        return await query
             .OrderBy(l => l.Name)
             .Select(l => new LecturerDto(
                 l.Id,
                 l.Name ?? string.Empty,
+                l.Email ?? string.Empty,
                 l.Department ?? string.Empty,
                 l.Quote ?? string.Empty,
                 l.AvatarUrl ?? string.Empty,
@@ -33,14 +36,9 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .ToListAsync(cancellationToken);
     }
 
-    /// <summary>
-    ///     Adds a new lecturer
-    /// </summary>
-    /// <param name="request">The create lecturer request containing lecturer information</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The created lecture entity</returns>
-    /// <exception cref="InvalidOperationException">Thrown when a lecturer with the same name already exists</exception>
-    public async Task<Lecture> AddLecturer(CreateLecturerRequest request, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<Lecturer> AddLecturer(CreateLecturerRequest request,
+        CancellationToken cancellationToken = default)
     {
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
@@ -49,14 +47,15 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
 
         if (existingLecture is not null)
-            throw new InvalidOperationException($"Lecture with name '{request.Name}' already exists");
+            throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
 
-        var lecture = new Lecture
+        var lecture = new Lecturer
         {
             Name = request.Name.Trim(),
+            Email = request.Email.Trim(),
             Department = request.Department.Trim(),
-            Quote = request.Quote?.Trim(),
-            AvatarUrl = request.AvatarUrl?.Trim()
+            Quote = request.Quote.Trim(),
+            AvatarUrl = request.AvatarUrl.Trim()
         };
 
         context.Lectures.Add(lecture);
@@ -65,25 +64,15 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         return lecture;
     }
 
-    /// <summary>
-    ///     Updates an existing lecturer
-    /// </summary>
-    /// <param name="id">The lecturer identifier</param>
-    /// <param name="request">The create lecturer request containing updated information</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The updated lecture entity</returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when lecturer is not found or another lecturer with the same name
-    ///     exists
-    /// </exception>
-    public async Task<Lecture> UpdateLecturer(Guid id, CreateLecturerRequest request,
+    /// <inheritdoc />
+    public async Task<Lecturer> UpdateLecturer(Guid id, CreateLecturerRequest request,
         CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
 
         if (lecture is null)
-            throw new InvalidOperationException($"Lecture with ID '{id}' not found");
+            throw new InvalidOperationException($"Lecturer with ID '{id}' not found");
 
         // Check if another lecture with same name exists (excluding current one)
         var existingLecture = await context.Lectures
@@ -94,47 +83,38 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                 cancellationToken);
 
         if (existingLecture is not null)
-            throw new InvalidOperationException($"Lecture with name '{request.Name}' already exists");
+            throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
 
         // Update properties
         lecture.Name = request.Name.Trim();
+        lecture.Email = request.Email.Trim();
         lecture.Department = request.Department.Trim();
-        lecture.Quote = request.Quote?.Trim();
-        lecture.AvatarUrl = request.AvatarUrl?.Trim();
+        lecture.Quote = request.Quote.Trim();
+        lecture.AvatarUrl = request.AvatarUrl.Trim();
 
         await context.SaveChangesAsync(cancellationToken);
         return lecture;
     }
 
-    /// <summary>
-    ///     Deletes a lecturer by its unique identifier
-    /// </summary>
-    /// <param name="id">The lecturer identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found</exception>
+    /// <inheritdoc />
     public async Task DeleteLecturer(Guid id, CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
 
         if (lecture is null)
-            throw new InvalidOperationException($"Lecture with ID '{id}' not found");
+            throw new InvalidOperationException($"Lecturer with ID '{id}' not found");
 
         context.Lectures.Remove(lecture);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    /// <summary>
-    ///     Activates a lecturer by ID so they can receive votes
-    /// </summary>
-    /// <param name="id">Lecturer ID</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found</exception>
+    /// <inheritdoc />
     public async Task ActivateLecturer(Guid id, CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
         if (lecture is null)
-            throw new InvalidOperationException($"Lecture with ID '{id}' not found");
+            throw new InvalidOperationException($"Lecturer with ID '{id}' not found");
 
         if (!lecture.IsActive)
         {
@@ -143,17 +123,12 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         }
     }
 
-    /// <summary>
-    ///     Deactivates a lecturer by ID so they cannot receive votes
-    /// </summary>
-    /// <param name="id">Lecturer ID</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found</exception>
+    /// <inheritdoc />
     public async Task DeactivateLecturer(Guid id, CancellationToken cancellationToken = default)
     {
         var lecture = await context.Lectures.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
         if (lecture is null)
-            throw new InvalidOperationException($"Lecture with ID '{id}' not found");
+            throw new InvalidOperationException($"Lecturer with ID '{id}' not found");
 
         if (lecture.IsActive)
         {

@@ -5,17 +5,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
 /// <summary>
-///     Entity Framework configuration for LectureVote entity
+///     Entity Framework configuration for LecturerVote entity
 /// </summary>
-public class LectureVoteConfiguration : IEntityTypeConfiguration<LectureVote>
+public class LectureVoteConfiguration : IEntityTypeConfiguration<LecturerVote>
 {
     /// <summary>
-    ///     Configures the LectureVote entity for Entity Framework
+    ///     Configures the LecturerVote entity for Entity Framework
     /// </summary>
     /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",
         Justification = "EF Core requires instance method for IEntityTypeConfiguration<T>.")]
-    public void Configure(EntityTypeBuilder<LectureVote> builder)
+    public void Configure(EntityTypeBuilder<LecturerVote> builder)
     {
         builder.ToTable("lecture_vote");
 

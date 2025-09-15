@@ -21,12 +21,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     /// <summary>
     ///     Gets or sets the lectures DbSet
     /// </summary>
-    public DbSet<Lecture> Lectures { get; set; }
+    public DbSet<Lecturer> Lectures { get; set; }
 
     /// <summary>
     ///     Gets or sets the lecture votes DbSet
     /// </summary>
-    public DbSet<LectureVote> LectureVotes { get; set; }
+    public DbSet<LecturerVote> LectureVotes { get; set; }
 
     /// <summary>
     ///     Gets or sets the feedback votes DbSet

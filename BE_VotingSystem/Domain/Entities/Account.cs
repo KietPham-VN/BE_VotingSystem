@@ -80,7 +80,7 @@ public class Account
     /// <summary>
     ///     Collection of votes cast by this account
     /// </summary>
-    public ICollection<LectureVote> Votes { get; set; } = [];
+    public ICollection<LecturerVote> Votes { get; set; } = [];
 
     /// <summary>
     ///     navigation property

@@ -5,19 +5,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 
 /// <summary>
-///     Entity Framework configuration for Lecture entity
+///     Entity Framework configuration for Lecturer entity
 /// </summary>
-public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
+public class LectureConfiguration : IEntityTypeConfiguration<Lecturer>
 {
     /// <summary>
-    ///     Configures the Lecture entity for Entity Framework
+    ///     Configures the Lecturer entity for Entity Framework
     /// </summary>
     /// <param name="builder">The entity type builder</param>
     [SuppressMessage("SonarAnalyzer.CSharp", "S2325",
         Justification = "EF Core requires instance method for IEntityTypeConfiguration<T>.")]
-    public void Configure(EntityTypeBuilder<Lecture> builder)
+    public void Configure(EntityTypeBuilder<Lecturer> builder)
     {
-        builder.ToTable("lecture", t =>
+        builder.ToTable("lecturer", t =>
         {
             t.HasCheckConstraint(
                 "CK_Lecture_Name_NotEmpty",
@@ -36,6 +36,10 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
             .IsRequired()
             .HasMaxLength(255);
         builder.HasIndex(l => l.Name);
+
+        builder.Property(l => l.Email)
+            .IsRequired()
+            .HasMaxLength(255);
 
         builder.Property(l => l.Department)
             .IsRequired()

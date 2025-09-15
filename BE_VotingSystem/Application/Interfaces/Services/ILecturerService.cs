@@ -12,9 +12,10 @@ public interface ILecturerService
     /// <summary>
     ///     Gets all lecturers with their vote counts
     /// </summary>
+    /// <param name="isActive">Optional filter by active state</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of lecturer DTOs</returns>
-    Task<List<LecturerDto>> GetLecturers(CancellationToken cancellationToken = default);
+    Task<List<LecturerDto>> GetLecturers(bool? isActive = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Adds a new lecturer
@@ -22,7 +23,7 @@ public interface ILecturerService
     /// <param name="request">Create lecturer request containing lecturer information</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created lecture entity</returns>
-    Task<Lecture> AddLecturer(CreateLecturerRequest request, CancellationToken cancellationToken = default);
+    Task<Lecturer> AddLecturer(CreateLecturerRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Updates an existing lecturer
@@ -31,7 +32,8 @@ public interface ILecturerService
     /// <param name="request">Update request containing new lecturer information</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated lecture entity</returns>
-    Task<Lecture> UpdateLecturer(Guid id, CreateLecturerRequest request, CancellationToken cancellationToken = default);
+    Task<Lecturer> UpdateLecturer(Guid id, CreateLecturerRequest request,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Deletes a lecturer by ID

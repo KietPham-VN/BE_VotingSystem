@@ -9,12 +9,7 @@ namespace BE_VotingSystem.Infrastructure.Services;
 /// </summary>
 public class AccountService(IAppDbContext dbContext) : IAccountService
 {
-    /// <summary>
-    ///     Gets an account by its unique identifier
-    /// </summary>
-    /// <param name="id">The account identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The account DTO if found, otherwise null</returns>
+    /// <inheritdoc />
     public Task<AccountDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return dbContext.Accounts
@@ -30,11 +25,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    /// <summary>
-    ///     Gets all accounts
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>A read-only list of account DTOs</returns>
+    /// <inheritdoc />
     public async Task<IReadOnlyList<AccountDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var list = await dbContext.Accounts
@@ -50,14 +41,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         return list;
     }
 
-    /// <summary>
-    ///     Updates an account with the provided information
-    /// </summary>
-    /// <param name="id">The account identifier</param>
-    /// <param name="request">The update request containing new account information</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The updated account DTO</returns>
-    /// <exception cref="InvalidOperationException">Thrown when account is not found</exception>
+    /// <inheritdoc />
     public async Task<AccountDto> UpdateAccountAsync(Guid id, UpdateAccountRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -90,12 +74,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         );
     }
 
-    /// <summary>
-    ///     Deletes an account by its unique identifier
-    /// </summary>
-    /// <param name="id">The account identifier</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <exception cref="InvalidOperationException">Thrown when account is not found or is an admin account</exception>
+    /// <inheritdoc />
     public async Task DeleteAccountAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var account = await dbContext.Accounts
@@ -112,14 +91,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    /// <summary>
-    ///     Bans or unbans an account
-    /// </summary>
-    /// <param name="id">The account identifier</param>
-    /// <param name="request">The ban request containing ban status and reason</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The updated account DTO</returns>
-    /// <exception cref="InvalidOperationException">Thrown when account is not found or is an admin account</exception>
+    /// <inheritdoc />
     public async Task<AccountDto> BanAccountAsync(Guid id, BanAccountRequest request,
         CancellationToken cancellationToken = default)
     {

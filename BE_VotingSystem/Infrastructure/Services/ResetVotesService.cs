@@ -19,10 +19,7 @@ public interface IResetVotesService
 /// </summary>
 public class ResetVotesService(IAppDbContext dbContext) : IResetVotesService
 {
-    /// <summary>
-    ///     Resets votes remain for all accounts to the default value (3)
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation</returns>
+    /// <inheritdoc/>
     public async Task ResetVotesRemainAsync()
     {
         var accounts = await dbContext.Accounts.ToListAsync();

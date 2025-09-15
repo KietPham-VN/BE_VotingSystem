@@ -3,7 +3,7 @@
 /// <summary>
 ///     Represents a lecturer/lecture in the voting system
 /// </summary>
-public class Lecture
+public class Lecturer
 {
     /// <summary>
     ///     Unique identifier for the lecture
@@ -14,6 +14,11 @@ public class Lecture
     ///     Name of the lecturer
     /// </summary>
     public string? Name { get; set; }
+
+    /// <summary>
+    ///     Lecturer's email
+    /// </summary>
+    public string? Email { get; set; }
 
     /// <summary>
     ///     Department the lecturer belongs to
@@ -38,5 +43,5 @@ public class Lecture
     /// <summary>
     ///     Collection of votes cast for this lecturer
     /// </summary>
-    public ICollection<LectureVote> Votes { get; set; } = [];
+    public ICollection<LecturerVote> Votes { get; set; } = [];
 }

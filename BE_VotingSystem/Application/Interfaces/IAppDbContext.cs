@@ -20,12 +20,12 @@ public interface IAppDbContext
     /// <summary>
     ///     Gets or sets the lectures DbSet
     /// </summary>
-    DbSet<Lecture> Lectures { get; set; }
+    DbSet<Lecturer> Lectures { get; set; }
 
     /// <summary>
     ///     Gets or sets the lecture votes DbSet
     /// </summary>
-    DbSet<LectureVote> LectureVotes { get; set; }
+    DbSet<LecturerVote> LectureVotes { get; set; }
 
     /// <summary>
     ///     Gets or sets the feedback votes DbSet

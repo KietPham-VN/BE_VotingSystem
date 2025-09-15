@@ -11,14 +11,7 @@ namespace BE_VotingSystem.Infrastructure.Services;
 /// </summary>
 public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
 {
-    /// <summary>
-    ///     Creates a website feedback vote for the specified account. Each account can only vote once.
-    /// </summary>
-    /// <param name="accountId">The account identifier from JWT</param>
-    /// <param name="request">The creation request containing the vote value</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The created feedback vote DTO</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the account has already voted</exception>
+    /// <inheritdoc />
     public async Task<FeedbackVoteDto> CreateAsync(Guid accountId, CreateFeedbackVoteRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -42,14 +35,7 @@ public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
         return new FeedbackVoteDto(email, entity.Vote, entity.VotedAt);
     }
 
-    /// <summary>
-    ///     Updates the website feedback vote for the specified account.
-    /// </summary>
-    /// <param name="accountId">The account identifier from JWT</param>
-    /// <param name="request">The update request containing the new vote value</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The updated feedback vote DTO</returns>
-    /// <exception cref="InvalidOperationException">Thrown when no existing vote is found</exception>
+    /// <inheritdoc />
     public async Task<FeedbackVoteDto> UpdateAsync(Guid accountId, UpdateFeedbackVoteRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -68,12 +54,7 @@ public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
         return new FeedbackVoteDto(email, entity.Vote, entity.VotedAt);
     }
 
-    /// <summary>
-    ///     Retrieves the current website feedback vote for the specified account, if any.
-    /// </summary>
-    /// <param name="accountId">The account identifier from JWT</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The feedback vote DTO or null</returns>
+    /// <inheritdoc />
     public Task<FeedbackVoteDto?> GetAsync(Guid accountId, CancellationToken cancellationToken = default)
     {
         return db.FeedbackVotes.AsNoTracking()
@@ -83,11 +64,7 @@ public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    /// <summary>
-    ///     Retrieves all website feedback votes.
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Read-only list of feedback votes</returns>
+    /// <inheritdoc />
     public async Task<IReadOnlyList<FeedbackVoteDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var list = await db.FeedbackVotes.AsNoTracking()

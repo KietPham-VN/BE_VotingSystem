@@ -3,7 +3,7 @@
 /// <summary>
 ///     Represents a vote cast by an account for a lecturer
 /// </summary>
-public class LectureVote
+public class LecturerVote
 {
     /// <summary>
     ///     Unique identifier for the vote
