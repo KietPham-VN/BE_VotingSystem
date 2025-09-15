@@ -4,7 +4,6 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea/
-BE_VotingSystem/Infrastructure/Database/Migrations/
 BE_VotingSystem/appsettings.json
 /.vs
 BE_VotingSystem/BE_VotingSystem.csproj.user
@@ -14,3 +13,4 @@ appsettings.json
 .env.*
 !.env.example
 /.cursor
+.vscode/
