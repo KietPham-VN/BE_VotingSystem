@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IResetVotesService, ResetVotesService>();
         services.AddScoped<ILecturerService, LecturerService>();
+        services.AddScoped<IFeedbackVoteService, FeedbackVoteService>();
         return services;
     }
 }
