@@ -7,7 +7,7 @@ namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 /// <summary>
 ///     Entity Framework configuration for LecturerVote entity
 /// </summary>
-public class LectureVoteConfiguration : IEntityTypeConfiguration<LecturerVote>
+public class LecturerVoteConfiguration : IEntityTypeConfiguration<LecturerVote>
 {
     /// <summary>
     ///     Configures the LecturerVote entity for Entity Framework
@@ -17,9 +17,8 @@ public class LectureVoteConfiguration : IEntityTypeConfiguration<LecturerVote>
         Justification = "EF Core requires instance method for IEntityTypeConfiguration<T>.")]
     public void Configure(EntityTypeBuilder<LecturerVote> builder)
     {
-        builder.ToTable("lecture_vote");
+        builder.ToTable("lecturer_vote");
 
-        // Single primary key để cho phép vote lại
         builder.HasKey(lv => lv.Id);
         builder.Property(lv => lv.Id)
             .ValueGeneratedOnAdd();

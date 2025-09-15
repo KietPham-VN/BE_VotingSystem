@@ -7,7 +7,7 @@ namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 /// <summary>
 ///     Entity Framework configuration for Lecturer entity
 /// </summary>
-public class LectureConfiguration : IEntityTypeConfiguration<Lecturer>
+public class LecturerConfiguration : IEntityTypeConfiguration<Lecturer>
 {
     /// <summary>
     ///     Configures the Lecturer entity for Entity Framework
