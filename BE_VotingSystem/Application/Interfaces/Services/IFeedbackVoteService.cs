@@ -24,4 +24,9 @@ public interface IFeedbackVoteService
     ///     Get current feedback vote for the specified account, or null if not voted yet
     /// </summary>
     Task<FeedbackVoteDto?> GetAsync(Guid accountId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Get all website feedback votes
+    /// </summary>
+    Task<IReadOnlyList<FeedbackVoteDto>> GetAllAsync(CancellationToken cancellationToken = default);
 }

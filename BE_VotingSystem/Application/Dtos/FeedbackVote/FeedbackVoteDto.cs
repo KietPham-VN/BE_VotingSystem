@@ -1,6 +1,6 @@
 namespace BE_VotingSystem.Application.Dtos.FeedbackVote;
 
 /// <summary>
-///     Represents feedback vote information of the current account
+///     Represents website feedback vote information
 /// </summary>
-public sealed record FeedbackVoteDto(int Vote, DateTime VotedAt);
+public sealed record FeedbackVoteDto(string Email, int Vote, DateTime VotedAt);

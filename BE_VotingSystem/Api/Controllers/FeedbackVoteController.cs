@@ -23,17 +23,15 @@ public sealed class FeedbackVoteController(IFeedbackVoteService service) : Contr
     }
 
     /// <summary>
-    ///     Get current user's feedback vote, if any
+    ///     Get all website feedback votes
     /// </summary>
     [HttpGet]
-    [SwaggerOperation(Summary = "Get my website feedback vote")]
-    [ProducesResponseType(typeof(FeedbackVoteDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<FeedbackVoteDto>> GetMine(CancellationToken cancellationToken = default)
+    [SwaggerOperation(Summary = "Get all website feedback votes")]
+    [ProducesResponseType(typeof(List<FeedbackVoteDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<FeedbackVoteDto>>> GetAll(CancellationToken cancellationToken = default)
     {
-        var accountId = GetAccountId(User);
-        var dto = await service.GetAsync(accountId, cancellationToken);
-        return dto is null ? NoContent() : Ok(dto);
+        var dtos = await service.GetAllAsync(cancellationToken);
+        return Ok(dtos);
     }
 
     /// <summary>

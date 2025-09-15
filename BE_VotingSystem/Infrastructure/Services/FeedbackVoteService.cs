@@ -35,7 +35,11 @@ public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
         db.FeedbackVotes.Add(entity);
         await db.SaveChangesAsync(cancellationToken);
 
-        return new FeedbackVoteDto(entity.Vote, entity.VotedAt);
+        var email = await db.Accounts.AsNoTracking()
+            .Where(a => a.Id == accountId)
+            .Select(a => a.Email)
+            .FirstAsync(cancellationToken);
+        return new FeedbackVoteDto(email, entity.Vote, entity.VotedAt);
     }
 
     /// <summary>
@@ -57,7 +61,11 @@ public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
         entity.VotedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(cancellationToken);
 
-        return new FeedbackVoteDto(entity.Vote, entity.VotedAt);
+        var email = await db.Accounts.AsNoTracking()
+            .Where(a => a.Id == accountId)
+            .Select(a => a.Email)
+            .FirstAsync(cancellationToken);
+        return new FeedbackVoteDto(email, entity.Vote, entity.VotedAt);
     }
 
     /// <summary>
@@ -70,7 +78,24 @@ public sealed class FeedbackVoteService(IAppDbContext db) : IFeedbackVoteService
     {
         return db.FeedbackVotes.AsNoTracking()
             .Where(x => x.AccountId == accountId)
-            .Select(x => new FeedbackVoteDto(x.Vote, x.VotedAt))
+            .Join(db.Accounts.AsNoTracking(), fv => fv.AccountId, a => a.Id,
+                (fv, a) => new FeedbackVoteDto(a.Email, fv.Vote, fv.VotedAt))
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    /// <summary>
+    ///     Retrieves all website feedback votes.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Read-only list of feedback votes</returns>
+    public async Task<IReadOnlyList<FeedbackVoteDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var list = await db.FeedbackVotes.AsNoTracking()
+            .Join(db.Accounts.AsNoTracking(), fv => fv.AccountId, a => a.Id,
+                (fv, a) => new { fv, a.Email })
+            .OrderByDescending(x => x.fv.VotedAt)
+            .Select(x => new FeedbackVoteDto(x.Email, x.fv.Vote, x.fv.VotedAt))
+            .ToListAsync(cancellationToken);
+        return list;
     }
 }
