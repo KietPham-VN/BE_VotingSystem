@@ -43,9 +43,12 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     public async Task<Lecture> AddLecturer(CreateLecturerRequest request, CancellationToken cancellationToken = default)
     {
         var existingLecture = await context.Lectures
-            .FirstOrDefaultAsync(l => l.Name!.ToLower() == request.Name.ToLower(), cancellationToken);
+            .FirstOrDefaultAsync(
+                l => l.Name != null && l.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase),
+                cancellationToken);
 
-        if (existingLecture != null)
+
+        if (existingLecture is not null)
             throw new InvalidOperationException($"Lecture with name '{request.Name}' already exists");
 
         var lecture = new Lecture
@@ -79,14 +82,18 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         var lecture = await context.Lectures
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
 
-        if (lecture == null)
+        if (lecture is null)
             throw new InvalidOperationException($"Lecture with ID '{id}' not found");
 
         // Check if another lecture with same name exists (excluding current one)
         var existingLecture = await context.Lectures
-            .FirstOrDefaultAsync(l => l.Name!.ToLower() == request.Name.ToLower() && l.Id != id, cancellationToken);
+            .FirstOrDefaultAsync(
+                l => l.Id != id &&
+                     l.Name != null &&
+                     l.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase),
+                cancellationToken);
 
-        if (existingLecture != null)
+        if (existingLecture is not null)
             throw new InvalidOperationException($"Lecture with name '{request.Name}' already exists");
 
         // Update properties
@@ -110,7 +117,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         var lecture = await context.Lectures
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
 
-        if (lecture == null)
+        if (lecture is null)
             throw new InvalidOperationException($"Lecture with ID '{id}' not found");
 
         context.Lectures.Remove(lecture);

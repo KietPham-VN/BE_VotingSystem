@@ -29,7 +29,7 @@ public class AuthService(
         if (user is null) return null;
 
         var verify = hasher.VerifyHashedPassword(user, user.PasswordHash ?? string.Empty, req.Password);
-        if (verify == PasswordVerificationResult.Failed) return null;
+        if (verify is PasswordVerificationResult.Failed) return null;
 
         var access = jwt.CreateAccessToken(user);
         var (refresh, refreshExp) = jwt.CreateRefreshToken();

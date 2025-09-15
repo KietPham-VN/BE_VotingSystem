@@ -23,7 +23,7 @@ public class ExternalAuthCallbackService(IAuthService authService) : IExternalAu
         CancellationToken cancellationToken)
     {
         var result = await httpContext.AuthenticateAsync("External");
-        if (result?.Principal == null) return (null, null);
+        if (result?.Principal is null) return (null, null);
 
         var principal = result.Principal;
 

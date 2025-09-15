@@ -64,20 +64,19 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         var account = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
-        if (account == null)
+        if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
-
         // Update properties if provided
-        if (request.Name != null)
+        if (request.Name is not null)
             account.Name = request.Name.Trim();
 
-        if (request.StudentCode != null)
+        if (request.StudentCode is not null)
             account.StudentCode = request.StudentCode.Trim();
 
         if (request.Semester.HasValue)
             account.Semester = request.Semester.Value;
 
-        if (request.Department != null)
+        if (request.Department is not null)
             account.Department = request.Department.Trim();
 
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -102,7 +101,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         var account = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
-        if (account == null)
+        if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
 
         // Prevent deleting admin accounts
@@ -127,7 +126,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         var account = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
-        if (account == null)
+        if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
 
         // Prevent banning admin accounts

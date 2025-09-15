@@ -38,5 +38,5 @@ public class Lecture
     /// <summary>
     ///     Collection of votes cast for this lecturer
     /// </summary>
-    public List<LectureVote> Votes { get; set; } = [];
+    public ICollection<LectureVote> Votes { get; set; } = [];
 }
