@@ -40,4 +40,18 @@ public interface ILecturerService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the asynchronous operation</returns>
     Task DeleteLecturer(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Activates a lecturer by ID so they can receive votes
+    /// </summary>
+    /// <param name="id">Lecturer ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task ActivateLecturer(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Deactivates a lecturer by ID so they cannot receive votes
+    /// </summary>
+    /// <param name="id">Lecturer ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task DeactivateLecturer(Guid id, CancellationToken cancellationToken = default);
 }

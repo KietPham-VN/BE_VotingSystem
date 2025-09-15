@@ -123,4 +123,42 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         context.Lectures.Remove(lecture);
         await context.SaveChangesAsync(cancellationToken);
     }
+
+    /// <summary>
+    ///     Activates a lecturer by ID so they can receive votes
+    /// </summary>
+    /// <param name="id">Lecturer ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found</exception>
+    public async Task ActivateLecturer(Guid id, CancellationToken cancellationToken = default)
+    {
+        var lecture = await context.Lectures.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+        if (lecture is null)
+            throw new InvalidOperationException($"Lecture with ID '{id}' not found");
+
+        if (!lecture.IsActive)
+        {
+            lecture.IsActive = true;
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    /// <summary>
+    ///     Deactivates a lecturer by ID so they cannot receive votes
+    /// </summary>
+    /// <param name="id">Lecturer ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <exception cref="InvalidOperationException">Thrown when lecturer is not found</exception>
+    public async Task DeactivateLecturer(Guid id, CancellationToken cancellationToken = default)
+    {
+        var lecture = await context.Lectures.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+        if (lecture is null)
+            throw new InvalidOperationException($"Lecture with ID '{id}' not found");
+
+        if (lecture.IsActive)
+        {
+            lecture.IsActive = false;
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
 }

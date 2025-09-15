@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IResetVotesService, ResetVotesService>();
         services.AddScoped<ILecturerService, LecturerService>();
         services.AddScoped<IFeedbackVoteService, FeedbackVoteService>();
+        services.AddScoped<ILectureVoteService, LectureVoteService>();
         return services;
     }
 }

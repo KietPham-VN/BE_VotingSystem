@@ -1,5 +1,6 @@
 ﻿using BE_VotingSystem.Application.Dtos.Account;
 using BE_VotingSystem.Application.Interfaces.Services;
+using BE_VotingSystem.Application.Dtos.Common;
 using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -24,7 +25,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
         var accounts = await accountService.GetAllAsync(ct);
-        return Ok(accounts);
+        return Ok(new ApiResponse<IEnumerable<AccountDto>>(accounts, "Fetched accounts successfully"));
     }
 
     /// <summary>
@@ -40,9 +41,9 @@ public class AccountController(IAccountService accountService) : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var account = await accountService.GetByIdAsync(id);
-        if (account is null) return NotFound();
+        if (account is null) return NotFound(new ApiResponse("Account not found"));
 
-        return Ok(account);
+        return Ok(new ApiResponse<AccountDto>(account, "Fetched account successfully"));
     }
 
     /// <summary>
@@ -61,13 +62,13 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<AccountDto>> UpdateAccount(
+    public async Task<ActionResult<ApiResponse<AccountDto>>> UpdateAccount(
         Guid id,
         [FromBody] UpdateAccountRequest request,
         CancellationToken cancellationToken = default)
     {
         var account = await accountService.UpdateAccountAsync(id, request, cancellationToken);
-        return Ok(account);
+        return Ok(new ApiResponse<AccountDto>(account, "Account updated successfully"));
     }
 
     /// <summary>
@@ -85,12 +86,12 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> DeleteAccount(
+    public async Task<ActionResult<ApiResponse>> DeleteAccount(
         Guid id,
         CancellationToken cancellationToken = default)
     {
         await accountService.DeleteAccountAsync(id, cancellationToken);
-        return NoContent();
+        return Ok(new ApiResponse("Account deleted successfully"));
     }
 
     /// <summary>
@@ -109,12 +110,13 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<AccountDto>> BanAccount(
+    public async Task<ActionResult<ApiResponse<AccountDto>>> BanAccount(
         Guid id,
         [FromBody] BanAccountRequest request,
         CancellationToken cancellationToken = default)
     {
         var account = await accountService.BanAccountAsync(id, request, cancellationToken);
-        return Ok(account);
+        var message = request.IsBanned ? "Account banned successfully" : "Account unbanned successfully";
+        return Ok(new ApiResponse<AccountDto>(account, message));
     }
 }
