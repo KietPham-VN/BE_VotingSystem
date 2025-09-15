@@ -18,7 +18,7 @@ public class LectureVote
     /// <summary>
     ///     Navigation property to the lecturer being voted for
     /// </summary>
-    public Lecture? Lecture { get; set; }
+    public Lecturer? Lecture { get; set; }
 
     /// <summary>
     ///     ID of the account that cast the vote
