@@ -8,6 +8,11 @@ namespace BE_VotingSystem.Application.Interfaces;
 public interface IAppDbContext
 {
     /// <summary>
+    ///     Gets or set for WebImages
+    /// </summary>
+    public DbSet<WebImage> WebImages { get; set; }
+
+    /// <summary>
     ///     Gets or sets the accounts DbSet
     /// </summary>
     DbSet<Account> Accounts { get; set; }

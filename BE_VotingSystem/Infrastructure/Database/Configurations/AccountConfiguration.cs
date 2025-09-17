@@ -7,7 +7,7 @@ namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 /// <summary>
 ///     Entity Framework configuration for Account entity
 /// </summary>
-public class AccountConfigurations : IEntityTypeConfiguration<Account>
+public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     /// <summary>
     ///     Configures the Account entity for Entity Framework
