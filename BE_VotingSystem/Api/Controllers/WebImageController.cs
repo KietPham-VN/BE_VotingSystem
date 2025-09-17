@@ -21,7 +21,7 @@ public class WebImageController(IWebImageService service) : ControllerBase
         Summary = "Get all web images",
         Description = "Returns the complete list of web images.",
         OperationId = "WebImages_GetAll",
-        Tags = new[] { "WebImages" }
+        Tags = ["WebImages"]
     )]
     [ProducesResponseType(typeof(IEnumerable<WebImageDto>), StatusCodes.Status200OK)]
     public async Task<IEnumerable<WebImageDto>> GetImages(CancellationToken cancellationToken)
