@@ -30,7 +30,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
 
         return await context.WebImages
             .AsNoTracking()
-            .Where(wi => wi.Name != null && wi.Name.Equals(normalized, StringComparison.OrdinalIgnoreCase))
+            .Where(wi => wi.Name != null && EF.Functions.Like(wi.Name, normalized))
             .Select
             (wi => new WebImageDto
                 (
@@ -49,7 +49,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
 
         var exists = await context.WebImages
             .AsNoTracking()
-            .AnyAsync(wi => wi.Name != null && wi.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+            .AnyAsync(wi => wi.Name != null && EF.Functions.Like(wi.Name, name),
                 cancellationToken);
 
         if (exists)
@@ -69,7 +69,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
     {
         var name = webImageDto.Name.Trim();
         var image = await context.WebImages.FirstOrDefaultAsync(wi =>
-            wi.Name != null && wi.Name.Equals(name, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            wi.Name != null && EF.Functions.Like(wi.Name, name), cancellationToken);
         if (image is null) throw new KeyNotFoundException("Image not found");
 
         // Do not change primary key (Name). Only update URL.
@@ -83,7 +83,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
     {
         var normalized = name.Trim();
         var image = await context.WebImages.FirstOrDefaultAsync(wi =>
-            wi.Name != null && wi.Name.Equals(normalized, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            wi.Name != null && EF.Functions.Like(wi.Name, normalized), cancellationToken);
         if (image is null) throw new KeyNotFoundException("Image not found");
 
         context.WebImages.Remove(image);

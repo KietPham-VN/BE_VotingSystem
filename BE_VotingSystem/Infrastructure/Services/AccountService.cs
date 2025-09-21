@@ -16,6 +16,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             .AsNoTracking()
             .Where(a => a.Id == id)
             .Select(a => new AccountDto(
+                a.Id,
                 a.StudentCode ?? string.Empty,
                 a.Email,
                 a.Name ?? string.Empty,
@@ -31,6 +32,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         var list = await dbContext.Accounts
             .AsNoTracking()
             .Select(a => new AccountDto(
+                a.Id,
                 a.StudentCode ?? string.Empty,
                 a.Email,
                 a.Name ?? string.Empty,
@@ -66,6 +68,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new AccountDto(
+            account.Id,
             account.StudentCode ?? string.Empty,
             account.Email,
             account.Name ?? string.Empty,
@@ -112,6 +115,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new AccountDto(
+            account.Id,
             account.StudentCode ?? string.Empty,
             account.Email,
             account.Name ?? string.Empty,

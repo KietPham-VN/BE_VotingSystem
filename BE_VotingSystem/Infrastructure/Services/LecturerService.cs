@@ -42,7 +42,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     {
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
-                l => l.Name != null && l.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase),
+                l => l.Name != null && EF.Functions.Like(l.Name, request.Name),
                 cancellationToken);
 
 
@@ -79,7 +79,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .FirstOrDefaultAsync(
                 l => l.Id != id &&
                      l.Name != null &&
-                     l.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase),
+                     EF.Functions.Like(l.Name, request.Name),
                 cancellationToken);
 
         if (existingLecture is not null)
