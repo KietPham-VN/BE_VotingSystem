@@ -21,7 +21,8 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
                 a.Email,
                 a.Name ?? string.Empty,
                 a.Semester.GetValueOrDefault(),
-                a.Department ?? string.Empty
+                a.Department ?? string.Empty,
+                a.IsAdmin
             ))
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -37,7 +38,8 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
                 a.Email,
                 a.Name ?? string.Empty,
                 a.Semester.GetValueOrDefault(),
-                a.Department ?? string.Empty
+                a.Department ?? string.Empty,
+                a.IsAdmin
             ))
             .ToListAsync(cancellationToken);
         return list;
@@ -73,7 +75,8 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             account.Email,
             account.Name ?? string.Empty,
             account.Semester.GetValueOrDefault(),
-            account.Department ?? string.Empty
+            account.Department ?? string.Empty,
+            account.IsAdmin
         );
     }
 
@@ -120,7 +123,8 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             account.Email,
             account.Name ?? string.Empty,
             account.Semester.GetValueOrDefault(),
-            account.Department ?? string.Empty
+            account.Department ?? string.Empty,
+            account.IsAdmin
         );
     }
 }

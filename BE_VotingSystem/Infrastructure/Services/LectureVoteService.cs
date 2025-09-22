@@ -24,6 +24,17 @@ public sealed class LectureVoteService(IAppDbContext db) : ILectureVoteService
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<VoteDto>> GetAllVotesByLectureAsync(Guid lectureId,
+        CancellationToken cancellationToken = default)
+    {
+        var votes = await db.LectureVotes.AsNoTracking()
+            .Where(v => v.LectureId == lectureId)
+            .Join(db.Accounts.AsNoTracking(), v => v.AccountId, a => a.Id, (v, a) => new VoteDto(a.Email, v.VotedAt))
+            .ToListAsync(cancellationToken);
+        return votes;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> VoteAsync(Guid accountId, CreateLectureVoteRequest request,
         CancellationToken cancellationToken = default)
     {

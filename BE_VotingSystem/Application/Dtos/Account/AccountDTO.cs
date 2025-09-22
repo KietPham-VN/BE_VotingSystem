@@ -9,10 +9,12 @@
 /// <param name="Name">Full name of the account holder</param>
 /// <param name="Semester">Current semester (0-9)</param>
 /// <param name="Department">Department name</param>
+/// <param name="IsAdmin">Indicates if the account has admin privileges</param>
 public sealed record AccountDto(
     Guid Id,
     string StudentCode,
     string Email,
     string Name,
     byte Semester,
-    string Department);
+    string Department,
+    bool IsAdmin);
