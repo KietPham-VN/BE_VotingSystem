@@ -14,6 +14,11 @@ public interface ILectureVoteService
     Task<IReadOnlyList<VoteDto>> GetVotesByLectureAsync(Guid lectureId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Get all-time votes by a specific lecturer (no date filter)
+    /// </summary>
+    Task<IReadOnlyList<VoteDto>> GetAllVotesByLectureAsync(Guid lectureId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Cast a vote for a lecturer by the current account
     /// </summary>
     Task<bool> VoteAsync(Guid accountId, CreateLectureVoteRequest request, CancellationToken cancellationToken = default);

@@ -1,6 +1,6 @@
 ﻿using BE_VotingSystem.Application.Dtos.Account;
-using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Application.Dtos.Common;
+using BE_VotingSystem.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -65,7 +65,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
     public async Task<ActionResult<ApiResponse<AccountDto>>> UpdateAccount(
         Guid id,
         [FromBody] UpdateAccountRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var account = await accountService.UpdateAccountAsync(id, request, cancellationToken);
         return Ok(new ApiResponse<AccountDto>(account, "Account updated successfully"));
@@ -76,7 +77,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     /// </summary>
     /// <param name="id">Account ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>No content</returns>
+    /// <returns>No content</returns> api/accounts/id
     [HttpDelete("{id:guid}")]
     [SwaggerOperation(
         Summary = "Delete an account",
@@ -88,7 +89,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> DeleteAccount(
         Guid id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await accountService.DeleteAccountAsync(id, cancellationToken);
         return Ok(new ApiResponse("Account deleted successfully"));
@@ -113,7 +115,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
     public async Task<ActionResult<ApiResponse<AccountDto>>> BanAccount(
         Guid id,
         [FromBody] BanAccountRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var account = await accountService.BanAccountAsync(id, request, cancellationToken);
         var message = request.IsBanned ? "Account banned successfully" : "Account unbanned successfully";

@@ -5,8 +5,14 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.OpenApi.Models;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
+
+ExcelPackage.License.SetNonCommercialPersonal("Keith");
+
+ExcelPackage.License.SetNonCommercialOrganization("Tên tổ chức của bạn");
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -42,6 +48,11 @@ builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssembli
 builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Warning);
 
 _ = builder.Services.AddInfrastructure(builder.Configuration);
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true; // prevent dev from forgetting to add services
+});
 
 var app = builder.Build();
 
