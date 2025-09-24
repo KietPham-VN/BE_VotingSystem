@@ -3,6 +3,7 @@ using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
@@ -42,7 +43,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     {
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
-                l => l.Name != null && l.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase),
+                l => l.Name != null && EF.Functions.Collate(l.Name, "utf8mb4_unicode_ci") == EF.Functions.Collate(request.Name, "utf8mb4_unicode_ci"),
                 cancellationToken);
 
 
@@ -79,7 +80,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .FirstOrDefaultAsync(
                 l => l.Id != id &&
                      l.Name != null &&
-                     l.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase),
+                     EF.Functions.Collate(l.Name, "utf8mb4_unicode_ci") == EF.Functions.Collate(request.Name, "utf8mb4_unicode_ci"),
                 cancellationToken);
 
         if (existingLecture is not null)

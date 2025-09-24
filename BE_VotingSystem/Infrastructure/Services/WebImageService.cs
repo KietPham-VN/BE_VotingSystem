@@ -2,6 +2,7 @@
 using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
@@ -30,7 +31,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
 
         return await context.WebImages
             .AsNoTracking()
-            .Where(wi => wi.Name != null && wi.Name.Equals(normalized, StringComparison.OrdinalIgnoreCase))
+            .Where(wi => wi.Name != null && EF.Functions.Collate(wi.Name, "utf8mb4_unicode_ci") == EF.Functions.Collate(normalized, "utf8mb4_unicode_ci"))
             .Select
             (wi => new WebImageDto
                 (
@@ -49,7 +50,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
 
         var exists = await context.WebImages
             .AsNoTracking()
-            .AnyAsync(wi => wi.Name != null && wi.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+            .AnyAsync(wi => wi.Name != null && EF.Functions.Collate(wi.Name, "utf8mb4_unicode_ci") == EF.Functions.Collate(name, "utf8mb4_unicode_ci"),
                 cancellationToken);
 
         if (exists)
@@ -69,7 +70,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
     {
         var name = webImageDto.Name.Trim();
         var image = await context.WebImages.FirstOrDefaultAsync(wi =>
-            wi.Name != null && wi.Name.Equals(name, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            wi.Name != null && EF.Functions.Collate(wi.Name, "utf8mb4_unicode_ci") == EF.Functions.Collate(name, "utf8mb4_unicode_ci"), cancellationToken);
         if (image is null) throw new KeyNotFoundException("Image not found");
 
         // Do not change primary key (Name). Only update URL.
@@ -83,7 +84,7 @@ public class WebImageService(IAppDbContext context) : IWebImageService
     {
         var normalized = name.Trim();
         var image = await context.WebImages.FirstOrDefaultAsync(wi =>
-            wi.Name != null && wi.Name.Equals(normalized, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            wi.Name != null && EF.Functions.Collate(wi.Name, "utf8mb4_unicode_ci") == EF.Functions.Collate(normalized, "utf8mb4_unicode_ci"), cancellationToken);
         if (image is null) throw new KeyNotFoundException("Image not found");
 
         context.WebImages.Remove(image);

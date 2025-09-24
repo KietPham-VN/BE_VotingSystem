@@ -71,4 +71,7 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.MapControllers();
 
+// Seed database with sample data
+await app.SeedDatabaseAsync();
+
 await app.RunAsync();
