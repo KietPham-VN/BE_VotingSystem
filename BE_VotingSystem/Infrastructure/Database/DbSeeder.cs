@@ -156,6 +156,7 @@ public static class DbSeeder
             lecturers.Add(new Lecturer
             {
                 Id = Guid.NewGuid(),
+                AccountName = $"gv{i + 1:000}",
                 Name = $"Giảng viên {i + 1}",
                 Email = $"lecturer{i + 1}@university.edu",
                 Department = department,

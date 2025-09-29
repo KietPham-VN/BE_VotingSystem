@@ -23,7 +23,6 @@ public class AuthController(IAuthService authService) : ControllerBase
         Description = "Validates a refresh token, rotates it, and returns new access/refresh tokens.")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshTokenRequest req, CancellationToken ct)
     {
         var tokens = await authService.RefreshAsync(req.RefreshToken, ct);
@@ -41,7 +40,6 @@ public class AuthController(IAuthService authService) : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [SwaggerOperation(
         Summary = "User Login",
         Description = "Validates credentials and returns JWT access token and refresh token on success."
