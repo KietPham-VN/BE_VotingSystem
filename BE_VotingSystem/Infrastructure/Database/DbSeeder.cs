@@ -89,23 +89,25 @@ public static class DbSeeder
     private static async Task<List<Account>> SeedAccountsAsync(AppDbContext context)
     {
         var random = new Random();
-        var accounts = new List<Account>
+        var accounts = new List<Account>();
+
+        var admin = new Account
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Email = "admin@voting.com",
-                Name = "Admin User",
-                StudentCode = "SS000001",
-                Semester = 9,
-                Department = "Kỹ thuật phần mềm",
-                IsAdmin = true,
-                IsBanned = false,
-                Provider = AuthProvider.Local,
-                ProviderId = "admin_local",
-                VotesRemain = 3
-            }
+            Id = Guid.NewGuid(),
+            Email = "admin@example.com",
+            Name = "Admin User",
+            StudentCode = "SS000001",
+            Semester = 9,
+            Department = "Kỹ thuật phần mềm",
+            IsAdmin = true,
+            IsBanned = false,
+            Provider = AuthProvider.Local,
+            ProviderId = "admin_local",
+            VotesRemain = 3
         };
+        var hasher = new PasswordHasher<Account>();
+        admin.PasswordHash = hasher.HashPassword(admin, "admin@123");
+        accounts.Add(admin);
 
         // Generate 9 more accounts with random departments
         for (var i = 1; i < 10; i++)
