@@ -39,7 +39,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     public async Task<ActionResult<ApiResponse<List<LecturerDto>>>> GetLectures(
         [FromQuery, SwaggerParameter(Description = "Filter by activity status: true=active, false=inactive; omit for all")] bool? isActive,
         [FromQuery, SwaggerParameter(Description = "Sort by field: Name, Votes, Department, Email (default: Name)")] SortBy sortBy = SortBy.Name,
-        [FromQuery, SwaggerParameter(Description = "Order direction: asc for ascending, desc for descending (default: asc)")] OrderBy order = OrderBy.Asc,
+        [FromQuery, SwaggerParameter(Description = "Order direction: asc for ascending, desc for descending (default: asc)")] OrderBy order = OrderBy.Desc,
         [FromQuery, SwaggerParameter(Description = "Number of records to return (default: all)")] int? top = null,
         CancellationToken cancellationToken = default)
     {
