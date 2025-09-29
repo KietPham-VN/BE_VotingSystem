@@ -90,7 +90,6 @@ public class AuthService(
         var access = jwt.CreateAccessToken(user);
         var (newRefresh, newRefreshExp) = jwt.CreateRefreshToken();
 
-        // rotate token: delete old, insert new
         db.RefreshTokens.Remove(new RefreshToken { Id = tokenEntity.Id });
         db.RefreshTokens.Add(new RefreshToken
             { Token = newRefresh, Expires = newRefreshExp, AccountId = user.Id });

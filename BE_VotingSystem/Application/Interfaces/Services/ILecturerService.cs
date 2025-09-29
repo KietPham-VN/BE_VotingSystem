@@ -1,6 +1,8 @@
 ﻿using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Domain.Entities;
+using BE_VotingSystem.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace BE_VotingSystem.Application.Interfaces.Services;
 
@@ -13,9 +15,17 @@ public interface ILecturerService
     ///     Gets all lecturers with their vote counts
     /// </summary>
     /// <param name="isActive">Optional filter by active state</param>
+    /// <param name="sortBy">Sort by field (Name, Votes, Department, Email)</param>
+    /// <param name="orderBy">Order direction (Asc, Desc)</param>
+    /// <param name="top">Number of records to return (null for all)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of lecturer DTOs</returns>
-    Task<List<LecturerDto>> GetLecturers(bool? isActive = null, CancellationToken cancellationToken = default);
+    Task<List<LecturerDto>> GetLecturers(
+        bool? isActive = null, 
+        SortBy sortBy = SortBy.Name, 
+        OrderBy orderBy = OrderBy.Asc, 
+        int? top = null, 
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Adds a new lecturer
@@ -56,4 +66,12 @@ public interface ILecturerService
     /// <param name="id">Lecturer ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     Task DeactivateLecturer(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Imports lecturers from Excel file
+    /// </summary>
+    /// <param name="file">Excel file containing lecturer data</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Import result with success/failure details</returns>
+    Task<ImportLecturersResponse> ImportLecturersFromExcel(IFormFile file, CancellationToken cancellationToken = default);
 }

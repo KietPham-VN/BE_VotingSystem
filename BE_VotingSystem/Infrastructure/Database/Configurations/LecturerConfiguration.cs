@@ -32,6 +32,11 @@ public class LecturerConfiguration : IEntityTypeConfiguration<Lecturer>
         builder.Property(l => l.Id)
             .ValueGeneratedOnAdd();
 
+        builder.Property(l => l.AccountName)
+            .IsRequired()
+            .HasMaxLength(255);
+        builder.HasIndex(l => l.AccountName).IsUnique();
+
         builder.Property(l => l.Name)
             .IsRequired()
             .HasMaxLength(255);

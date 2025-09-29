@@ -15,18 +15,21 @@ namespace BE_VotingSystem.Infrastructure.Services;
 /// <param name="feedbackVoteService">Service for feedback vote operations</param>
 /// <param name="accountService">Service for account operations</param>
 /// <param name="environment">Use to configure path</param>
-public class ReportService(
+public class ReportService
+(
     ILecturerService lecturerService,
     ILectureVoteService lectureVoteService,
     IFeedbackVoteService feedbackVoteService,
     IAccountService accountService,
-    IWebHostEnvironment environment) : IReportService
+    IWebHostEnvironment environment
+) : IReportService
 {
     /// <summary>
     ///     Generates a comprehensive voting report with all data
     /// </summary>
     public async Task<byte[]> GenerateVotingReportAsync(CancellationToken cancellationToken = default)
     {
+        
         var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
         if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
@@ -49,6 +52,7 @@ public class ReportService(
     /// </summary>
     public async Task<byte[]> GenerateLecturerReportAsync(CancellationToken cancellationToken = default)
     {
+        
         var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
         if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
@@ -68,6 +72,7 @@ public class ReportService(
     /// </summary>
     public async Task<byte[]> GenerateFeedbackReportAsync(CancellationToken cancellationToken = default)
     {
+        
         var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
         if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
@@ -193,7 +198,6 @@ public class ReportService(
 
             accountRow++;
         }
-
 
         worksheet.Cells["M21"].Value = "TOTAL";
         worksheet.Cells["N21"].Value = lecturers.Sum(l => l.Votes);
@@ -338,7 +342,6 @@ public class ReportService(
         await FillParticipantsData(participantsSheet, lecturers, accounts, cancellationToken);
         FillEvaluationStatsData(evaluationStatsSheet, feedbackVotes);
     }
-
 
     /// <summary>
     ///     Applies consistent table formatting to a range

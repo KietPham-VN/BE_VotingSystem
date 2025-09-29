@@ -54,7 +54,6 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
 
         if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
-        // Update properties if provided
         if (request.Name is not null)
             account.Name = request.Name.Trim();
 
@@ -89,7 +88,6 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
 
-        // Prevent deleting admin accounts
         if (account.IsAdmin)
             throw new InvalidOperationException("Cannot delete admin accounts");
 
@@ -107,11 +105,9 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
         if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
 
-        // Prevent banning admin accounts
         if (account.IsAdmin)
             throw new InvalidOperationException("Cannot ban admin accounts");
 
-        // Update ban status and reason
         account.IsBanned = request.IsBanned;
         account.BanReason = request.IsBanned ? request.Reason : null;
 

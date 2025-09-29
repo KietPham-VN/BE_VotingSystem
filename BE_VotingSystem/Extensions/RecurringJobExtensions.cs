@@ -1,7 +1,7 @@
 using BE_VotingSystem.Infrastructure.Services;
 using Hangfire;
 
-namespace BE_VotingSystem.Infrastructure.Extensions;
+namespace BE_VotingSystem.Extensions;
 
 /// <summary>
 ///     Provides extension methods for configuring recurring background jobs
@@ -20,7 +20,7 @@ public static class RecurringJobExtensions
         recurringJobManager.AddOrUpdate<IResetVotesService>(
             "reset-votes-remain",
             service => service.ResetVotesRemainAsync(),
-            Cron.Daily(0, 0), // 24:00 (midnight)
+            Cron.Daily(0, 0),
             new RecurringJobOptions
             {
                 TimeZone = TimeZoneInfo.Local

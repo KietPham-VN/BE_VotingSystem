@@ -9,7 +9,7 @@ namespace BE_VotingSystem.Infrastructure.Database;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options), IAppDbContext
 {
     /// <summary>
-    ///     Gets or set for WebImages
+    ///     Gets or sets WebImages
     /// </summary>
     public DbSet<WebImage> WebImages { get; set; }
 

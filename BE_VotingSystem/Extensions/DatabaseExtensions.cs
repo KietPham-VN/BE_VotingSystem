@@ -2,7 +2,7 @@ using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Infrastructure.Database;
 using BE_VotingSystem.Infrastructure.Setting;
 
-namespace BE_VotingSystem.Infrastructure.Extensions;
+namespace BE_VotingSystem.Extensions;
 
 /// <summary>
 ///     Provides extension methods for configuring database services

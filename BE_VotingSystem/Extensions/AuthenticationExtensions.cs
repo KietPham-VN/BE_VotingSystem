@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BE_VotingSystem.Infrastructure.Extensions;
+namespace BE_VotingSystem.Extensions;
 
 /// <summary>
 ///     Provides extension methods for configuring authentication services

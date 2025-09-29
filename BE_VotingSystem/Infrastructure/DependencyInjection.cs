@@ -1,7 +1,7 @@
 ﻿using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Application.Interfaces.Utils;
 using BE_VotingSystem.Domain.Entities;
-using BE_VotingSystem.Infrastructure.Extensions;
+using BE_VotingSystem.Extensions;
 using BE_VotingSystem.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 

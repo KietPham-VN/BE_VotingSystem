@@ -3,7 +3,7 @@ using BE_VotingSystem.Infrastructure.Setting;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 
-namespace BE_VotingSystem.Infrastructure.Extensions;
+namespace BE_VotingSystem.Extensions;
 
 /// <summary>
 ///     Provides extension methods for configuring Google authentication services
@@ -19,23 +19,20 @@ public static class GoogleAuthExtensions
     public static AuthenticationBuilder AddGoogleAuthConfiguration(this AuthenticationBuilder authBuilder,
         IConfiguration configuration)
     {
-        // Google settings
         var google = configuration.GetSection(GoogleSettings.SectionName).Get<GoogleSettings>();
         if (google is null) throw new InvalidOperationException("Missing Google settings");
 
-        // cookie tạm cho external sign-in
         authBuilder.AddCookie("External", cookie =>
         {
             cookie.Cookie.SameSite = SameSiteMode.Lax;
             cookie.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
 
-        // Google OAuth
         authBuilder.AddGoogle("Google", options =>
         {
             options.ClientId = google.ClientId;
             options.ClientSecret = google.ClientSecret;
-            options.CallbackPath = google.CallbackPath; // "/signin-google"
+            options.CallbackPath = google.CallbackPath;
             options.SignInScheme = "External";
             options.SaveTokens = true;
             options.CorrelationCookie.SameSite = SameSiteMode.Lax;

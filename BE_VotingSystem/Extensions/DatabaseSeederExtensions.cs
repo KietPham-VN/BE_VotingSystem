@@ -1,6 +1,6 @@
 using BE_VotingSystem.Infrastructure.Database;
 
-namespace BE_VotingSystem.Infrastructure.Extensions;
+namespace BE_VotingSystem.Extensions;
 
 /// <summary>
 ///     Extension methods for database seeding

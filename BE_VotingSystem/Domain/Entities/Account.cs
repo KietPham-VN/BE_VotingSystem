@@ -83,7 +83,7 @@ public class Account
     public ICollection<LecturerVote> Votes { get; set; } = [];
 
     /// <summary>
-    ///     navigation property
+    ///     Navigation property for feedback vote
     /// </summary>
     public FeedbackVote? FeedbackVote { get; set; }
 }

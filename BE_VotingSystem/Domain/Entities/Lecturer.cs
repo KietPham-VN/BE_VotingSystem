@@ -11,6 +11,11 @@ public class Lecturer
     public Guid Id { get; set; }
 
     /// <summary>
+    ///     Unique identifier account for the lecture in the uni system
+    /// </summary>
+    public string? AccountName { get; set; }
+
+    /// <summary>
     ///     Name of the lecturer
     /// </summary>
     public string? Name { get; set; }

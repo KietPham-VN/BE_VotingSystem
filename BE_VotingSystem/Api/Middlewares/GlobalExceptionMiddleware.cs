@@ -15,13 +15,33 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
     /// <returns>A task representing the asynchronous operation</returns>
     public async Task InvokeAsync(HttpContext context)
     {
+        var correlationId = Guid.NewGuid().ToString();
+        context.Items["CorrelationId"] = correlationId;
+
+        logger.LogInformation("Request started: {Method} {Path} from {RemoteIp} - CorrelationId: {CorrelationId}",
+            context.Request.Method,
+            context.Request.Path,
+            context.Connection.RemoteIpAddress,
+            correlationId);
+
         try
         {
             await next(context).ConfigureAwait(false);
+            
+            logger.LogInformation("Request completed: {Method} {Path} - Status: {StatusCode} - CorrelationId: {CorrelationId}",
+                context.Request.Method,
+                context.Request.Path,
+                context.Response.StatusCode,
+                correlationId);
         }
         catch (AppException appEx)
         {
-            logger.LogWarning(appEx, "Handled AppException: {ExceptionType}", appEx.GetType().Name);
+            logger.LogWarning(appEx, 
+                "Handled AppException: {ExceptionType} - Method: {Method} - Path: {Path} - CorrelationId: {CorrelationId}",
+                appEx.GetType().Name,
+                context.Request.Method,
+                context.Request.Path,
+                correlationId);
 
             IDictionary<string, string[]>? errors = null;
             if (appEx is ValidationException vex) errors = vex.Errors;
@@ -31,12 +51,25 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
                 (int)appEx.StatusCode,
                 appEx.GetType().Name,
                 appEx.Message,
-                errors).ConfigureAwait(false);
+                errors,
+                correlationId).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception");
-            await WriteProblemDetailsAsync(context, 500, "Internal Server Error", "An unexpected error occurred.");
+            logger.LogError(ex, 
+                "Unhandled exception - Method: {Method} - Path: {Path} - UserAgent: {UserAgent} - CorrelationId: {CorrelationId}",
+                context.Request.Method,
+                context.Request.Path,
+                context.Request.Headers.UserAgent,
+                correlationId);
+                
+            await WriteProblemDetailsAsync(
+                context, 
+                500, 
+                "Internal Server Error", 
+                "An unexpected error occurred.",
+                null,
+                correlationId);
         }
     }
 
@@ -48,9 +81,10 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
     /// <param name="title">The problem title</param>
     /// <param name="detail">The problem detail</param>
     /// <param name="errors">Optional validation errors</param>
+    /// <param name="correlationId">Correlation ID for tracking</param>
     /// <returns>A task representing the asynchronous operation</returns>
     private static async Task WriteProblemDetailsAsync(HttpContext context, int statusCode, string title, string detail,
-        IDictionary<string, string[]>? errors = null)
+        IDictionary<string, string[]>? errors = null, string? correlationId = null)
     {
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/problem+json";
@@ -60,7 +94,11 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
             title,
             status = statusCode,
             detail,
-            errors
+            errors,
+            correlationId,
+            timestamp = DateTime.UtcNow,
+            path = context.Request.Path,
+            method = context.Request.Method
         };
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(problemDetails), context.RequestAborted)

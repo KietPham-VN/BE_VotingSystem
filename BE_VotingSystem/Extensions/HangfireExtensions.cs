@@ -2,7 +2,7 @@ using BE_VotingSystem.Infrastructure.Setting;
 using Hangfire;
 using Hangfire.MySql;
 
-namespace BE_VotingSystem.Infrastructure.Extensions;
+namespace BE_VotingSystem.Extensions;
 
 /// <summary>
 ///     Provides extension methods for configuring Hangfire background job services
@@ -25,7 +25,6 @@ public static class HangfireExtensions
         if (dbSettings == null || string.IsNullOrEmpty(dbSettings.DefaultConnection))
             throw new InvalidOperationException("Missing connection string in appsettings.json");
 
-        // Hangfire configuration
         services.AddHangfire(configuration => configuration
             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
             .UseSimpleAssemblyNameTypeSerializer()
