@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using BE_VotingSystem.Application.Dtos.Auth;
 using BE_VotingSystem.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Authentication;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 

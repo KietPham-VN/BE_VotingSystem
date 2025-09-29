@@ -1,6 +1,5 @@
 ﻿using BE_VotingSystem.Application.Dtos.WebImage;
 using BE_VotingSystem.Application.Interfaces.Services;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 

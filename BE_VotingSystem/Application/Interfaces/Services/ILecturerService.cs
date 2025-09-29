@@ -2,7 +2,6 @@
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Domain.Enums;
-using Microsoft.AspNetCore.Http;
 
 namespace BE_VotingSystem.Application.Interfaces.Services;
 
@@ -22,10 +21,10 @@ public interface ILecturerService
     /// <returns>List of lecturer DTOs</returns>
     Task<List<LecturerDto>> GetLecturers(
         Guid? currentAccountId = null,
-        bool? isActive = null, 
-        SortBy sortBy = SortBy.Name, 
-        OrderBy orderBy = OrderBy.Asc, 
-        int? top = null, 
+        bool? isActive = null,
+        SortBy sortBy = SortBy.Name,
+        OrderBy orderBy = OrderBy.Asc,
+        int? top = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

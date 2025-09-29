@@ -4,7 +4,6 @@ using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Application.Interfaces.Utils;
 using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Domain.Enums;
-using Microsoft.AspNetCore.Identity;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
@@ -30,7 +29,7 @@ public class AuthService(
         var (refresh, refreshExp) = jwt.CreateRefreshToken();
 
         db.RefreshTokens.Add(new RefreshToken
-            { Token = refresh, Expires = refreshExp, AccountId = user.Id });
+        { Token = refresh, Expires = refreshExp, AccountId = user.Id });
         await db.SaveChangesAsync(ct);
 
         return new AuthResponse
@@ -63,7 +62,7 @@ public class AuthService(
         var access = jwt.CreateAccessToken(user);
         var (refresh, refreshExp) = jwt.CreateRefreshToken();
         db.RefreshTokens.Add(new RefreshToken
-            { Token = refresh, Expires = refreshExp, AccountId = user.Id });
+        { Token = refresh, Expires = refreshExp, AccountId = user.Id });
         await db.SaveChangesAsync(ct);
         return new AuthResponse
         {
@@ -92,7 +91,7 @@ public class AuthService(
 
         db.RefreshTokens.Remove(new RefreshToken { Id = tokenEntity.Id });
         db.RefreshTokens.Add(new RefreshToken
-            { Token = newRefresh, Expires = newRefreshExp, AccountId = user.Id });
+        { Token = newRefresh, Expires = newRefreshExp, AccountId = user.Id });
         await db.SaveChangesAsync(ct);
 
         return new AuthResponse

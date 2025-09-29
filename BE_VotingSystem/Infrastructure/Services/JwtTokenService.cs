@@ -1,8 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using BE_VotingSystem.Application.Interfaces.Utils;
+﻿using BE_VotingSystem.Application.Interfaces.Utils;
 using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Infrastructure.Setting;
 using Microsoft.Extensions.Options;

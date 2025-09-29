@@ -1,6 +1,5 @@
 using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace BE_VotingSystem.Infrastructure.Database;
 
@@ -10,7 +9,7 @@ namespace BE_VotingSystem.Infrastructure.Database;
 public static class DbSeeder
 {
     // Lecturer departments
-    private static readonly string[] LecturerDepartments = 
+    private static readonly string[] LecturerDepartments =
     [
         "Bộ môn Tiếng Anh dự bị",
         "Bộ môn Âm nhạc Truyền thống",
@@ -33,7 +32,7 @@ public static class DbSeeder
     ];
 
     // Account departments
-    private static readonly string[] AccountDepartments = 
+    private static readonly string[] AccountDepartments =
     [
         "Kỹ thuật phần mềm",
         "An toàn thông tin",
@@ -113,12 +112,12 @@ public static class DbSeeder
         {
             var department = AccountDepartments[random.Next(AccountDepartments.Length)];
             var isBanned = i == 9; // Last account is banned
-            
+
             // Generate valid StudentCode format: SS/SA/SE/CS/CA/CE/HS/HE/HA/QS/QA/QE/DS/DA/DE + 6 digits
             var prefixes = new[] { "SS", "SA", "SE", "CS", "CA", "CE", "HS", "HE", "HA", "QS", "QA", "QE", "DS", "DA", "DE" };
             var prefix = prefixes[random.Next(prefixes.Length)];
             var studentCode = $"{prefix}{random.Next(100000, 999999)}";
-            
+
             accounts.Add(new Account
             {
                 Id = Guid.NewGuid(),
@@ -151,7 +150,7 @@ public static class DbSeeder
         {
             var department = LecturerDepartments[random.Next(LecturerDepartments.Length)];
             var isActive = i < 8; // First 8 are active, last 2 are inactive
-            
+
             lecturers.Add(new Lecturer
             {
                 Id = Guid.NewGuid(),
@@ -183,17 +182,17 @@ public static class DbSeeder
             var account = activeAccounts[random.Next(activeAccounts.Count)];
             var lecturer = activeLecturers[random.Next(activeLecturers.Count)];
             var votedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-random.Next(0, 30)));
-            
+
             // Create unique key to avoid duplicates
             var uniqueKey = $"{lecturer.Id}-{account.Id}-{votedDate:yyyy-MM-dd}";
-            
+
             // Skip if this combination already exists
             if (usedCombinations.Contains(uniqueKey))
             {
                 i--; // Try again
                 continue;
             }
-            
+
             usedCombinations.Add(uniqueKey);
 
             votes.Add(new LecturerVote
@@ -218,7 +217,7 @@ public static class DbSeeder
         for (var i = 0; i < Math.Min(10, accounts.Count); i++)
         {
             var account = accounts[i];
-            
+
             feedbackVotes.Add(new FeedbackVote
             {
                 AccountId = account.Id,

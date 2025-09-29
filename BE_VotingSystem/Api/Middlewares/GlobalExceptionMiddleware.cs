@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using BE_VotingSystem.Domain.Exceptions;
+﻿using BE_VotingSystem.Domain.Exceptions;
 
 namespace BE_VotingSystem.Api.Middlewares;
 
@@ -27,7 +26,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         try
         {
             await next(context).ConfigureAwait(false);
-            
+
             logger.LogInformation("Request completed: {Method} {Path} - Status: {StatusCode} - CorrelationId: {CorrelationId}",
                 context.Request.Method,
                 context.Request.Path,
@@ -36,7 +35,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         }
         catch (AppException appEx)
         {
-            logger.LogWarning(appEx, 
+            logger.LogWarning(appEx,
                 "Handled AppException: {ExceptionType} - Method: {Method} - Path: {Path} - CorrelationId: {CorrelationId}",
                 appEx.GetType().Name,
                 context.Request.Method,
@@ -44,7 +43,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
                 correlationId);
 
             IDictionary<string, string[]>? errors = null;
-            if (appEx is ValidationException vex) errors = vex.Errors;
+            if (appEx is Domain.Exceptions.ValidationException vex) errors = vex.Errors;
 
             await WriteProblemDetailsAsync(
                 context,
@@ -56,17 +55,17 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, 
+            logger.LogError(ex,
                 "Unhandled exception - Method: {Method} - Path: {Path} - UserAgent: {UserAgent} - CorrelationId: {CorrelationId}",
                 context.Request.Method,
                 context.Request.Path,
                 context.Request.Headers.UserAgent,
                 correlationId);
-                
+
             await WriteProblemDetailsAsync(
-                context, 
-                500, 
-                "Internal Server Error", 
+                context,
+                500,
+                "Internal Server Error",
                 "An unexpected error occurred.",
                 null,
                 correlationId);

@@ -1,11 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using BE_VotingSystem.Application.Dtos.Common;
 using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
-using BE_VotingSystem.Application.Dtos.Common;
 
 namespace BE_VotingSystem.Api.Controllers;
 
@@ -14,7 +10,7 @@ namespace BE_VotingSystem.Api.Controllers;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("api/lectures/{lectureId:guid}/votes")] 
+[Route("api/lectures/{lectureId:guid}/votes")]
 public sealed class LectureVoteController(ILectureVoteService service) : ControllerBase
 {
     private static Guid GetAccountId(ClaimsPrincipal user)

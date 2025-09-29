@@ -1,5 +1,4 @@
 ﻿using BE_VotingSystem.Application.Dtos.PingDTO;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 

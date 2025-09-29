@@ -2,8 +2,6 @@ using BE_VotingSystem.Application.Dtos.Account;
 using BE_VotingSystem.Application.Dtos.FeedbackVote;
 using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Interfaces.Services;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
@@ -29,7 +27,6 @@ public class ReportService
     /// </summary>
     public async Task<byte[]> GenerateVotingReportAsync(CancellationToken cancellationToken = default)
     {
-        
         var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
         if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
@@ -52,7 +49,6 @@ public class ReportService
     /// </summary>
     public async Task<byte[]> GenerateLecturerReportAsync(CancellationToken cancellationToken = default)
     {
-        
         var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
         if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
@@ -72,7 +68,6 @@ public class ReportService
     /// </summary>
     public async Task<byte[]> GenerateFeedbackReportAsync(CancellationToken cancellationToken = default)
     {
-        
         var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
         if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");

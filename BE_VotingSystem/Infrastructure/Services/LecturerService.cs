@@ -4,11 +4,6 @@ using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Domain.Enums;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
@@ -19,13 +14,14 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 {
     private const string CollationUtf8Mb4UnicodeCi = "utf8mb4_unicode_ci";
     private const string EmailField = "Email";
+
     /// <inheritdoc />
     public async Task<List<LecturerDto>> GetLecturers(
         Guid? currentAccountId = null,
-        bool? isActive = null, 
-        SortBy sortBy = SortBy.Name, 
-        OrderBy orderBy = OrderBy.Asc, 
-        int? top = null, 
+        bool? isActive = null,
+        SortBy sortBy = SortBy.Name,
+        OrderBy orderBy = OrderBy.Asc,
+        int? top = null,
         CancellationToken cancellationToken = default)
     {
         var query = context.Lectures
@@ -39,16 +35,16 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         // Apply sorting
         query = sortBy switch
         {
-            SortBy.Name => orderBy == OrderBy.Asc 
+            SortBy.Name => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Name)
                 : query.OrderByDescending(l => l.Name),
-            SortBy.Votes => orderBy == OrderBy.Asc 
+            SortBy.Votes => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Votes.Count)
                 : query.OrderByDescending(l => l.Votes.Count),
-            SortBy.Department => orderBy == OrderBy.Asc 
+            SortBy.Department => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Department)
                 : query.OrderByDescending(l => l.Department),
-            SortBy.Email => orderBy == OrderBy.Asc 
+            SortBy.Email => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Email)
                 : query.OrderByDescending(l => l.Email),
             _ => query.OrderBy(l => l.Name)
@@ -104,7 +100,6 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .FirstOrDefaultAsync(
                 l => l.Name != null && EF.Functions.Collate(l.Name, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.Name, CollationUtf8Mb4UnicodeCi),
                 cancellationToken);
-
 
         if (existingLecture is not null)
             throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
@@ -241,7 +236,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
             var processedEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var processedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            
+
             for (var i = 2; i <= rowCount; i++)
             {
                 try
@@ -332,20 +327,20 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                     await context.SaveChangesAsync(cancellationToken);
                     response.ImportedCount = lecturersToAdd.Count;
                 }
-                    catch (DbUpdateException ex)
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException?.Message?.Contains("Duplicate entry") == true)
                     {
-                        if (ex.InnerException?.Message?.Contains("Duplicate entry") == true)
-                        {
-                            var individualSaveResults = await SaveLecturersIndividually(lecturersToAdd, cancellationToken);
-                            response.ImportedCount = individualSaveResults.SuccessCount;
-                            response.RowErrors.AddRange(individualSaveResults.Errors);
-                            response.FailedCount += individualSaveResults.FailedCount;
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        var individualSaveResults = await SaveLecturersIndividually(lecturersToAdd, cancellationToken);
+                        response.ImportedCount = individualSaveResults.SuccessCount;
+                        response.RowErrors.AddRange(individualSaveResults.Errors);
+                        response.FailedCount += individualSaveResults.FailedCount;
                     }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
 
             response.IsSuccess = response.ImportedCount > 0;
@@ -412,8 +407,6 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         return (errors.Count == 0, errors);
     }
 
-    
-
     private static bool IsValidEmail(string email)
     {
         try
@@ -429,7 +422,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
     private static bool IsValidUrl(string url)
     {
-        return Uri.TryCreate(url, UriKind.Absolute, out var result) && 
+        return Uri.TryCreate(url, UriKind.Absolute, out var result) &&
                (result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps);
     }
 
@@ -442,24 +435,24 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
         foreach (var lecturer in lecturers)
         {
-                try
-                {
-                    context.Lectures.Add(lecturer);
-                    await context.SaveChangesAsync(cancellationToken);
-                    successCount++;
-                }
+            try
+            {
+                context.Lectures.Add(lecturer);
+                await context.SaveChangesAsync(cancellationToken);
+                successCount++;
+            }
             catch (DbUpdateException ex)
             {
                 failedCount++;
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;
-                
+
                 errors.Add(new RowError
                 {
                     RowNumber = 0,
                     ErrorMessage = $"Failed to save lecturer '{lecturer.Name}': {errorMessage}",
                     Field = null
                 });
-                
+
                 if (context is DbContext dbContext)
                 {
                     dbContext.Entry(lecturer).State = EntityState.Detached;

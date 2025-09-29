@@ -1,5 +1,3 @@
-using Hangfire.Dashboard;
-
 namespace BE_VotingSystem.Api.Middlewares;
 
 /// <summary>

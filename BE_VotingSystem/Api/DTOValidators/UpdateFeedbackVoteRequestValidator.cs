@@ -1,5 +1,4 @@
 using BE_VotingSystem.Application.Dtos.FeedbackVote.Requests;
-using FluentValidation;
 
 namespace BE_VotingSystem.Api.DTOValidators;
 

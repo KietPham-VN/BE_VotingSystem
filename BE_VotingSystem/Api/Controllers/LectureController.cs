@@ -1,15 +1,10 @@
-﻿using BE_VotingSystem.Api.DTOValidators;
-using BE_VotingSystem.Application.Dtos.Common;
+﻿using BE_VotingSystem.Application.Dtos.Common;
 using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces.Services;
 using BE_VotingSystem.Domain.Entities;
 using BE_VotingSystem.Domain.Enums;
 using BE_VotingSystem.Infrastructure.Services;
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
-using System.Security.Claims;
 
 namespace BE_VotingSystem.Api.Controllers;
 
@@ -45,7 +40,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
         CancellationToken cancellationToken = default)
     {
         Guid? accountId = null;
-        var sub = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) 
+        var sub = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)
                   ?? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
         if (Guid.TryParse(sub, out var parsed)) accountId = parsed;
 
@@ -204,7 +199,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     {
         var logger = HttpContext.RequestServices.GetRequiredService<ILogger<LectureController>>();
         var correlationId = HttpContext.Items["CorrelationId"]?.ToString() ?? Guid.NewGuid().ToString();
-        
+
         logger.LogInformation("Import lecturers request started - File: {FileName}, Size: {FileSize} bytes, ContentType: {ContentType} - CorrelationId: {CorrelationId}",
             request.File?.FileName,
             request.File?.Length,
@@ -231,18 +226,18 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
                 result.ImportedCount,
                 result.FailedCount,
                 correlationId);
-            
+
             if (result.IsSuccess)
             {
                 var message = $"Successfully imported {result.ImportedCount} lecturers";
                 if (result.FailedCount > 0)
                     message += $", {result.FailedCount} failed";
-                
+
                 return Ok(new ApiResponse<ImportLecturersResponse>(result, message));
             }
             else
             {
-                var errorMessage = result.Errors.Any() 
+                var errorMessage = result.Errors.Any()
                     ? $"Import failed: {string.Join(", ", result.Errors)}"
                     : "Import failed";
                 return BadRequest(new ApiResponse<ImportLecturersResponse>(result, errorMessage));
@@ -254,7 +249,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
                 request.File?.FileName,
                 request.File?.Length,
                 correlationId);
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 new ApiResponse<ImportLecturersResponse>(null!, $"An error occurred during import: {ex.Message}"));
         }
     }
@@ -276,12 +271,12 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
         {
             var templateBytes = ExcelTemplateService.CreateLecturerImportTemplate();
             var fileName = $"LecturerImportTemplate_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            
+
             return File(templateBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 new ApiResponse($"An error occurred while creating template: {ex.Message}"));
         }
     }

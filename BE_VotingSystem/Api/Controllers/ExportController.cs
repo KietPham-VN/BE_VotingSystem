@@ -1,6 +1,4 @@
 using BE_VotingSystem.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BE_VotingSystem.Api.Controllers;
 
@@ -37,12 +35,12 @@ public class ExportController : ControllerBase
         {
             var reportBytes = await _reportService.GenerateVotingReportAsync(cancellationToken);
             var fileName = $"VotingReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            
+
             return File(reportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 new { message = "Error generating voting report", error = ex.Message });
         }
     }
@@ -61,12 +59,12 @@ public class ExportController : ControllerBase
         {
             var reportBytes = await _reportService.GenerateLecturerReportAsync(cancellationToken);
             var fileName = $"LecturerReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            
+
             return File(reportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 new { message = "Error generating lecturer report", error = ex.Message });
         }
     }
@@ -85,12 +83,12 @@ public class ExportController : ControllerBase
         {
             var reportBytes = await _reportService.GenerateFeedbackReportAsync(cancellationToken);
             var fileName = $"FeedbackReport_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-            
+
             return File(reportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 new { message = "Error generating feedback report", error = ex.Message });
         }
     }

@@ -1,8 +1,6 @@
 ﻿using BE_VotingSystem.Application.Dtos.Account;
 using BE_VotingSystem.Application.Dtos.Common;
 using BE_VotingSystem.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace BE_VotingSystem.Api.Controllers;
 

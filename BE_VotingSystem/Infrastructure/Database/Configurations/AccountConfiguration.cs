@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using BE_VotingSystem.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using BE_VotingSystem.Domain.Entities;
 
 namespace BE_VotingSystem.Infrastructure.Database.Configurations;
 

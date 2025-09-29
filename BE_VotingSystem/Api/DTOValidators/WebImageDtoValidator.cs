@@ -1,10 +1,9 @@
 ﻿using BE_VotingSystem.Application.Dtos.WebImage;
-using FluentValidation;
 
 namespace BE_VotingSystem.Api.DTOValidators;
 
 /// <summary>
-///     Validator for <see cref="BE_VotingSystem.Application.Dtos.WebImage.WebImageDto"/>.
+///     Validator for <see cref="WebImageDto"/>.
 /// </summary>
 public class WebImageDtoValidator : AbstractValidator<WebImageDto>
 {

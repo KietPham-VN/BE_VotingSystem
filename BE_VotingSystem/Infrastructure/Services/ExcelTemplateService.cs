@@ -1,6 +1,3 @@
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-
 namespace BE_VotingSystem.Infrastructure.Services;
 
 /// <summary>
