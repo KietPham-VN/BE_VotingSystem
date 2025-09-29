@@ -9,6 +9,7 @@ using BE_VotingSystem.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace BE_VotingSystem.Api.Controllers;
 
@@ -43,7 +44,12 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
         [FromQuery, SwaggerParameter(Description = "Number of records to return (default: all)")] int? top = null,
         CancellationToken cancellationToken = default)
     {
-        var lectures = await service.GetLecturers(isActive, sortBy, order, top, cancellationToken);
+        Guid? accountId = null;
+        var sub = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub) 
+                  ?? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(sub, out var parsed)) accountId = parsed;
+
+        var lectures = await service.GetLecturers(accountId, isActive, sortBy, order, top, cancellationToken);
         return Ok(new ApiResponse<List<LecturerDto>>(lectures, "Fetched lectures successfully"));
     }
 

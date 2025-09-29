@@ -21,6 +21,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     private const string EmailField = "Email";
     /// <inheritdoc />
     public async Task<List<LecturerDto>> GetLecturers(
+        Guid? currentAccountId = null,
         bool? isActive = null, 
         SortBy sortBy = SortBy.Name, 
         OrderBy orderBy = OrderBy.Asc, 
@@ -57,17 +58,42 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         if (top.HasValue && top.Value > 0)
             query = query.Take(top.Value);
 
-        return await query
-            .Select(l => new LecturerDto(
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        // Preload today's votes for current account if provided
+        Dictionary<Guid, bool> lecturerIdToVoted = new();
+        if (currentAccountId.HasValue)
+        {
+            lecturerIdToVoted = await context.LectureVotes.AsNoTracking()
+                .Where(v => v.AccountId == currentAccountId.Value && v.VotedAt == today)
+                .GroupBy(v => v.LectureId)
+                .Select(g => new { LectureId = g.Key })
+                .ToDictionaryAsync(x => x.LectureId, _ => true, cancellationToken);
+        }
+
+        var list = await query
+            .Select(l => new
+            {
                 l.Id,
-                l.Name ?? string.Empty,
-                l.Email ?? string.Empty,
-                l.Department ?? string.Empty,
-                l.Quote ?? string.Empty,
-                l.AvatarUrl ?? string.Empty,
-                l.Votes.Count
-            ))
+                l.Name,
+                l.Email,
+                l.Department,
+                l.Quote,
+                l.AvatarUrl,
+                Votes = l.Votes.Count
+            })
             .ToListAsync(cancellationToken);
+
+        return list.Select(l => new LecturerDto(
+            l.Id,
+            l.Name ?? string.Empty,
+            l.Email ?? string.Empty,
+            l.Department ?? string.Empty,
+            l.Quote ?? string.Empty,
+            l.AvatarUrl ?? string.Empty,
+            l.Votes,
+            currentAccountId.HasValue && lecturerIdToVoted.ContainsKey(l.Id)
+        )).ToList();
     }
 
     /// <inheritdoc />
@@ -177,7 +203,18 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
         try
         {
-            
+            // Delete all existing lecturers before importing new ones
+            if (context is DbContext dbContext)
+            {
+                await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+                await context.Lectures.ExecuteDeleteAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }
+            else
+            {
+                await context.Lectures.ExecuteDeleteAsync(cancellationToken);
+            }
+
             using var stream = file.OpenReadStream();
             using var package = new ExcelPackage(stream);
             var worksheet = package.Workbook.Worksheets[0];
@@ -219,18 +256,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                         continue;
                     }
 
-                    var isDuplicateInDb = await IsDuplicateLecturer(lecturerData, cancellationToken);
-                    if (isDuplicateInDb)
-                    {
-                        response.RowErrors.Add(new RowError
-                        {
-                            RowNumber = i,
-                            ErrorMessage = $"Lecturer with email '{lecturerData.Email}' already exists in database",
-                            Field = EmailField
-                        });
-                        response.FailedCount++;
-                        continue;
-                    }
+                    // After clearing existing data, only validate duplicates within the current batch
 
                     if (!string.IsNullOrWhiteSpace(lecturerData.Email))
                     {
@@ -386,17 +412,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         return (errors.Count == 0, errors);
     }
 
-    private async Task<bool> IsDuplicateLecturer(LecturerData data, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(data.Email))
-            return false;
-
-        return await context.Lectures
-            .AnyAsync(l => l.Email != null && 
-                          EF.Functions.Collate(l.Email, CollationUtf8Mb4UnicodeCi) == 
-                          EF.Functions.Collate(data.Email, CollationUtf8Mb4UnicodeCi), 
-                      cancellationToken);
-    }
+    
 
     private static bool IsValidEmail(string email)
     {

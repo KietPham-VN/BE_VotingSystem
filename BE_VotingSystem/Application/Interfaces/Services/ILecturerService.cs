@@ -21,6 +21,7 @@ public interface ILecturerService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of lecturer DTOs</returns>
     Task<List<LecturerDto>> GetLecturers(
+        Guid? currentAccountId = null,
         bool? isActive = null, 
         SortBy sortBy = SortBy.Name, 
         OrderBy orderBy = OrderBy.Asc, 
