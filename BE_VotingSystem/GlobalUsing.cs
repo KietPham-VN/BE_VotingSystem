@@ -14,4 +14,6 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using OfficeOpenXml;
 global using OfficeOpenXml.Style;
+global using Serilog;
+global using Serilog.Events;
 global using Swashbuckle.AspNetCore.Annotations;

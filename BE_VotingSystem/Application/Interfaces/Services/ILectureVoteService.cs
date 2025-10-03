@@ -1,5 +1,6 @@
 using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
+using BE_VotingSystem.Application.Dtos.Common;
 
 namespace BE_VotingSystem.Application.Interfaces.Services;
 
@@ -27,4 +28,9 @@ public interface ILectureVoteService
     ///     Cancel today's vote for a lecturer by the current account
     /// </summary>
     Task<bool> CancelAsync(Guid accountId, CancelLectureVoteRequest request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Get current user's lecturer vote history with pagination
+    /// </summary>
+    Task<PagedResult<VoteHistoryItemDto>> GetMyVoteHistoryAsync(Guid accountId, int page, int pageSize, CancellationToken cancellationToken = default);
 }

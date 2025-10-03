@@ -144,14 +144,25 @@ public class ReportService
         var votesSem1to6 = 0;
         var votesProbation = 0;
 
+        // Departments with 1-point votes; others count as 2 points
+        var onePointDepartments = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Tiếng Anh dự bị",
+            "Âm nhạc Truyền thống",
+            "Kỹ năng mềm",
+            "Giáo dục thể chất",
+            "Toán"
+        };
+
         foreach (var lecturer in lecturers)
         {
             var votes = await lectureVoteService.GetAllVotesByLectureAsync(lecturer.Id, cancellationToken);
             if (votes.Count == 0) continue;
 
-            votesSem7to9 += votes.Count(v => sem7to9Emails.Contains(v.Email));
-            votesSem1to6 += votes.Count(v => sem1to6Emails.Contains(v.Email));
-            votesProbation += votes.Count(v => probationEmails.Contains(v.Email));
+            var weight = onePointDepartments.Contains(lecturer.Department) ? 1 : 2;
+            votesSem7to9 += weight * votes.Count(v => sem7to9Emails.Contains(v.Email));
+            votesSem1to6 += weight * votes.Count(v => sem1to6Emails.Contains(v.Email));
+            votesProbation += weight * votes.Count(v => probationEmails.Contains(v.Email));
         }
 
         var totalVotesAllGroups = votesSem7to9 + votesSem1to6 + votesProbation;

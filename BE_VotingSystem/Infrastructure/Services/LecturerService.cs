@@ -32,15 +32,14 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         if (isActive is not null)
             query = query.Where(l => l.IsActive == isActive);
 
-        // Apply sorting
+        // Apply sorting (defer SortBy.Votes to client after weighting)
         query = sortBy switch
         {
             SortBy.Name => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Name)
                 : query.OrderByDescending(l => l.Name),
-            SortBy.Votes => orderBy == OrderBy.Asc
-                ? query.OrderBy(l => l.Votes.Count)
-                : query.OrderByDescending(l => l.Votes.Count),
+            // For weighted votes, we cannot sort reliably at DB level; sort after materialization
+            SortBy.Votes => query.OrderBy(l => l.Name),
             SortBy.Department => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Department)
                 : query.OrderByDescending(l => l.Department),
@@ -50,8 +49,9 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             _ => query.OrderBy(l => l.Name)
         };
 
-        // Apply top limit if specified
-        if (top.HasValue && top.Value > 0)
+        // Apply top limit early only when not sorting by weighted votes
+        var applyTopAfterWeighting = sortBy == SortBy.Votes && top.HasValue && top.Value > 0;
+        if (!applyTopAfterWeighting && top.HasValue && top.Value > 0)
             query = query.Take(top.Value);
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -80,16 +80,47 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             })
             .ToListAsync(cancellationToken);
 
-        return list.Select(l => new LecturerDto(
-            l.Id,
-            l.Name ?? string.Empty,
-            l.Email ?? string.Empty,
-            l.Department ?? string.Empty,
-            l.Quote ?? string.Empty,
-            l.AvatarUrl ?? string.Empty,
-            l.Votes,
-            currentAccountId.HasValue && lecturerIdToVoted.ContainsKey(l.Id)
-        )).ToList();
+        // Departments with 1-point votes; others count as 2 points
+        var onePointDepartments = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Tiếng Anh dự bị",
+            "Âm nhạc Truyền thống",
+            "Kỹ năng mềm",
+            "Giáo dục thể chất",
+            "Toán"
+        };
+
+        var dtos = list
+            .Select(l =>
+            {
+                var department = l.Department ?? string.Empty;
+                var weight = onePointDepartments.Contains(department) ? 1 : 2;
+                var weightedVotes = l.Votes * weight;
+                return new LecturerDto(
+                    l.Id,
+                    l.Name ?? string.Empty,
+                    l.Email ?? string.Empty,
+                    department,
+                    l.Quote ?? string.Empty,
+                    l.AvatarUrl ?? string.Empty,
+                    weightedVotes,
+                    currentAccountId.HasValue && lecturerIdToVoted.ContainsKey(l.Id)
+                );
+            })
+            .ToList();
+
+        if (sortBy == SortBy.Votes)
+        {
+            dtos = (orderBy == OrderBy.Asc
+                ? dtos.OrderBy(d => d.Votes).ThenBy(d => d.Name)
+                : dtos.OrderByDescending(d => d.Votes).ThenBy(d => d.Name))
+                .ToList();
+
+            if (applyTopAfterWeighting)
+                dtos = dtos.Take(top!.Value).ToList();
+        }
+
+        return dtos;
     }
 
     /// <inheritdoc />

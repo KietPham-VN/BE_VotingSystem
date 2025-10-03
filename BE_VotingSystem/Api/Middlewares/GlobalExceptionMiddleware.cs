@@ -5,7 +5,7 @@ namespace BE_VotingSystem.Api.Middlewares;
 /// <summary>
 ///     Global exception handling middleware for the application
 /// </summary>
-public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
+public class GlobalExceptionMiddleware(RequestDelegate next)
 {
     /// <summary>
     ///     Invokes the middleware to handle exceptions
@@ -17,7 +17,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         var correlationId = Guid.NewGuid().ToString();
         context.Items["CorrelationId"] = correlationId;
 
-        logger.LogInformation("Request started: {Method} {Path} from {RemoteIp} - CorrelationId: {CorrelationId}",
+        Log.Information("Request started: {Method} {Path} from {RemoteIp} - CorrelationId: {CorrelationId}",
             context.Request.Method,
             context.Request.Path,
             context.Connection.RemoteIpAddress,
@@ -27,7 +27,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         {
             await next(context).ConfigureAwait(false);
 
-            logger.LogInformation("Request completed: {Method} {Path} - Status: {StatusCode} - CorrelationId: {CorrelationId}",
+            Log.Information("Request completed: {Method} {Path} - Status: {StatusCode} - CorrelationId: {CorrelationId}",
                 context.Request.Method,
                 context.Request.Path,
                 context.Response.StatusCode,
@@ -35,7 +35,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         }
         catch (AppException appEx)
         {
-            logger.LogWarning(appEx,
+            Log.Warning(appEx,
                 "Handled AppException: {ExceptionType} - Method: {Method} - Path: {Path} - CorrelationId: {CorrelationId}",
                 appEx.GetType().Name,
                 context.Request.Method,
@@ -53,9 +53,30 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
                 errors,
                 correlationId).ConfigureAwait(false);
         }
+        catch (OperationCanceledException)
+        {
+            // Handle request cancellation (client disconnect, timeout, etc.)
+            Log.Information(
+                "Request cancelled: {Method} {Path} - CorrelationId: {CorrelationId}",
+                context.Request.Method,
+                context.Request.Path,
+                correlationId);
+
+            // Don't write response if the request was cancelled
+            if (!context.RequestAborted.IsCancellationRequested)
+            {
+                await WriteProblemDetailsAsync(
+                    context,
+                    499, // Client Closed Request status code
+                    "Request Cancelled",
+                    "The request was cancelled by the client.",
+                    null,
+                    correlationId).ConfigureAwait(false);
+            }
+        }
         catch (Exception ex)
         {
-            logger.LogError(ex,
+            Log.Error(ex,
                 "Unhandled exception - Method: {Method} - Path: {Path} - UserAgent: {UserAgent} - CorrelationId: {CorrelationId}",
                 context.Request.Method,
                 context.Request.Path,

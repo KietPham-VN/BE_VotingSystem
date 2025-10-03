@@ -11,5 +11,6 @@ public sealed record UpdateAccountRequest(
     string? Name,
     string? StudentCode,
     byte? Semester,
-    string? Department
+    string? Department,
+    bool? IsAdmin
 );

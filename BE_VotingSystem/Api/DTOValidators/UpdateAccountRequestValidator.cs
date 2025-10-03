@@ -33,5 +33,7 @@ public class UpdateAccountRequestValidator : AbstractValidator<UpdateAccountRequ
             .Must(department => string.IsNullOrEmpty(department) || !string.IsNullOrWhiteSpace(department))
             .WithMessage("Department cannot be empty or whitespace.")
             .When(x => !string.IsNullOrEmpty(x.Department));
+        RuleFor(x => x.IsAdmin)
+            .NotNull().WithMessage("IsAdmin cannot be null");
     }
 }

@@ -2,6 +2,7 @@ using BE_VotingSystem.Application.Dtos.Common;
 using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces.Services;
+using BE_VotingSystem.Application.Dtos.Common;
 
 namespace BE_VotingSystem.Api.Controllers;
 
@@ -29,6 +30,26 @@ public sealed class LectureVoteController(ILectureVoteService service) : Control
     {
         var result = await service.GetVotesByLectureAsync(lectureId, cancellationToken);
         return Ok(new ApiResponse<IReadOnlyList<VoteDto>>(result, "Fetched votes successfully"));
+    }
+
+    /// <summary>
+    ///     Get current user's lecturer vote history
+    /// </summary>
+    [HttpGet("/api/lecture-votes/history")]
+    [SwaggerOperation(Summary = "Get my vote history", Description = "Returns paged list of my lecturer votes.")]
+    [ProducesResponseType(typeof(ApiResponse<PagedResult<VoteHistoryItemDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<PagedResult<VoteHistoryItemDto>>>> GetMyHistory(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(sub, out var accountId) || accountId == Guid.Empty)
+            return Unauthorized(new ApiResponse("Unauthorized"));
+
+        var result = await service.GetMyVoteHistoryAsync(accountId, page, pageSize, cancellationToken);
+        return Ok(new ApiResponse<PagedResult<VoteHistoryItemDto>>(result, "Fetched vote history successfully"));
     }
 
     /// <summary>

@@ -65,6 +65,9 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
 
         if (request.Department is not null)
             account.Department = request.Department.Trim();
+        if (request.IsAdmin.HasValue)
+            account.IsAdmin = request.IsAdmin.Value;
+
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

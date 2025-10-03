@@ -2,6 +2,7 @@ using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
+using BE_VotingSystem.Application.Dtos.Common;
 using BE_VotingSystem.Domain.Entities;
 
 namespace BE_VotingSystem.Infrastructure.Services;
@@ -86,5 +87,31 @@ public sealed class LectureVoteService(IAppDbContext db) : ILectureVoteService
 
         await db.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedResult<VoteHistoryItemDto>> GetMyVoteHistoryAsync(
+        Guid accountId,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var votesQuery = db.LectureVotes
+            .AsNoTracking()
+            .Where(v => v.AccountId == accountId);
+
+        var totalCount = await votesQuery.CountAsync(cancellationToken);
+
+        var items = await votesQuery
+            .OrderByDescending(v => v.VotedAt)
+            .Select(v => new VoteHistoryItemDto(v.Lecture!.Name, v.Lecture!.Department, v.VotedAt))
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<VoteHistoryItemDto>(items, totalCount, page, pageSize);
     }
 }

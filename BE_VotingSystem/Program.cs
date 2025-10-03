@@ -8,7 +8,30 @@ using Microsoft.OpenApi.Models;
 using OfficeOpenXml;
 using Microsoft.AspNetCore.Http.Features;
 
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithMachineName()
+    .Enrich.WithProcessId()
+    .Enrich.WithThreadId()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/app-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Use Serilog
+builder.Host.UseSerilog();
 
 ExcelPackage.License.SetNonCommercialPersonal("BE_VotingSystem");
 
@@ -167,18 +190,15 @@ catch (Exception ex)
 
 try
 {
-    Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Starting application...");
+    Log.Information("Starting application...");
     await app.RunAsync();
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] APPLICATION RUN FAILED:");
-    Console.WriteLine($"Exception type: {ex.GetType().Name}");
-    Console.WriteLine($"Exception message: {ex.Message}");
-    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    Console.WriteLine($"Inner exception: {ex.InnerException}");
-    
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogCritical(ex, "Application terminated unexpectedly");
+    Log.Fatal(ex, "Application terminated unexpectedly");
     Environment.Exit(1);
+}
+finally
+{
+    Log.CloseAndFlush();
 }
