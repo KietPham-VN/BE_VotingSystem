@@ -13,6 +13,7 @@ public interface ILecturerService
     /// <summary>
     ///     Gets all lecturers with their vote counts
     /// </summary>
+    /// <param name="currentAccountId">Current account ID to check if voted today</param>
     /// <param name="isActive">Optional filter by active state</param>
     /// <param name="sortBy">Sort by field (Name, Votes, Department, Email)</param>
     /// <param name="orderBy">Order direction (Asc, Desc)</param>
@@ -26,6 +27,15 @@ public interface ILecturerService
         OrderBy orderBy = OrderBy.Asc,
         int? top = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Gets a specific lecturer by ID with their vote count
+    /// </summary>
+    /// <param name="id">Lecturer ID</param>
+    /// <param name="currentAccountId">Current account ID to check if voted today</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Lecturer DTO if found, null otherwise</returns>
+    Task<LecturerDto?> GetLecturerById(Guid id, Guid? currentAccountId = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Adds a new lecturer

@@ -129,6 +129,56 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     }
 
     /// <inheritdoc />
+    public async Task<LecturerDto?> GetLecturerById(Guid id, Guid? currentAccountId = null, CancellationToken cancellationToken = default)
+    {
+        var lecturer = await context.Lectures
+            .AsNoTracking()
+            .Include(l => l.Votes)
+            .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+
+        if (lecturer == null)
+            return null;
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        bool hasVoted = false;
+
+        if (currentAccountId.HasValue)
+        {
+            hasVoted = await context.LectureVotes.AsNoTracking()
+                .AnyAsync(v => v.AccountId == currentAccountId.Value && 
+                             v.LectureId == id && 
+                             v.VotedAt == today, cancellationToken);
+        }
+
+        // Calculate weighted votes (same logic as GetLecturers)
+        var onePointDepartments = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Tiếng Anh dự bị",
+            "Âm nhạc Truyền thống",
+            "Kỹ năng mềm",
+            "Giáo dục thể chất",
+            "Toán"
+        };
+
+        var department = lecturer.Department ?? string.Empty;
+        var weight = onePointDepartments.Contains(department) ? 1 : 2;
+        var votes = lecturer.Votes.Count;
+        var weightedVotes = votes * weight;
+
+        return new LecturerDto(
+            lecturer.Id,
+            lecturer.AccountName ?? string.Empty,
+            lecturer.Name ?? string.Empty,
+            lecturer.Email ?? string.Empty,
+            department,
+            lecturer.Quote ?? string.Empty,
+            lecturer.AvatarUrl ?? string.Empty,
+            weightedVotes,
+            hasVoted
+        );
+    }
+
+    /// <inheritdoc />
     public async Task<Lecturer> AddLecturer(CreateLecturerRequest request,
         CancellationToken cancellationToken = default)
     {

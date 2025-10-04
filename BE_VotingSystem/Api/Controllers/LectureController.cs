@@ -49,6 +49,37 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     }
 
     /// <summary>
+    ///     Get a specific lecturer by ID
+    /// </summary>
+    /// <param name="id">Lecturer ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Lecturer details</returns>
+    [HttpGet("{id:guid}")]
+    [SwaggerOperation(
+        Summary = "Get lecturer by ID",
+        Description = "Retrieves a specific lecturer by their unique identifier with vote information.")]
+    [ProducesResponseType(typeof(ApiResponse<LecturerDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<ApiResponse<LecturerDto>>> GetLecturer(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        Guid? accountId = null;
+        var sub = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)
+                  ?? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(sub, out var parsed)) accountId = parsed;
+
+        var lecturer = await service.GetLecturerById(id, accountId, cancellationToken);
+        
+        if (lecturer == null)
+            return NotFound(new ApiResponse<LecturerDto>(null!, "Lecturer not found"));
+
+        return Ok(new ApiResponse<LecturerDto>(lecturer, "Lecturer retrieved successfully"));
+    }
+
+    /// <summary>
     ///     Create a new lecture
     /// </summary>
     /// <param name="request">Lecturer creation request</param>
