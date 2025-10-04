@@ -21,7 +21,7 @@ public static class ExcelTemplateService
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Lecturers");
 
-            var headers = new[] { "Account", "Họ tên", "Email", "Bộ môn", "Câu nói truyền cảm hứng", "Hình ảnh" };
+            var headers = new[] { "Account", "Họ tên", "Email", "Bộ môn", "Câu nói truyền cảm hứng" };
             for (var i = 0; i < headers.Length; i++)
             {
                 worksheet.Cells[1, i + 1].Value = headers[i];
@@ -30,7 +30,7 @@ public static class ExcelTemplateService
                 worksheet.Cells[1, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
             }
 
-            var sampleData = new[] { "GV001", "Nguyễn Văn A", "nguyenvana@example.com", "Công nghệ thông tin", "Học tập là chìa khóa thành công", "https://example.com/image.jpg" };
+            var sampleData = new[] { "GV001", "Nguyễn Văn A", "nguyenvana@example.com", "Công nghệ thông tin", "Học tập là chìa khóa thành công" };
             for (var i = 0; i < sampleData.Length; i++)
             {
                 worksheet.Cells[2, i + 1].Value = sampleData[i];

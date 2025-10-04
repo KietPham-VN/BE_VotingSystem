@@ -23,6 +23,7 @@ public class WebImageController(IWebImageService service) : ControllerBase
         Tags = ["WebImages"]
     )]
     [ProducesResponseType(typeof(IEnumerable<WebImageDto>), StatusCodes.Status200OK)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IEnumerable<WebImageDto>> GetImages(CancellationToken cancellationToken)
     {
         return await service.GetAllImages(cancellationToken);

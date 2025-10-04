@@ -1,6 +1,7 @@
 using BE_VotingSystem.Application.Dtos.Account;
 using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
+using BE_VotingSystem.Domain.Exceptions;
 
 namespace BE_VotingSystem.Infrastructure.Services;
 
@@ -46,7 +47,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
     }
 
     /// <inheritdoc />
-    public async Task<AccountDto> UpdateAccountAsync(Guid id, UpdateAccountRequest request,
+    public async Task<AccountDto> UpdateAccountAsync(Guid id, UpdateAccountRequest request, Guid currentUserId,
         CancellationToken cancellationToken = default)
     {
         var account = await dbContext.Accounts
@@ -54,6 +55,17 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
 
         if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
+
+        // If trying to change admin status, verify current user is admin
+        if (request.IsAdmin.HasValue)
+        {
+            var currentUser = await dbContext.Accounts
+                .FirstOrDefaultAsync(a => a.Id == currentUserId, cancellationToken);
+
+            if (currentUser?.IsAdmin != true)
+                throw new ForbiddenException("Only admin users can grant or revoke admin privileges");
+        }
+
         if (request.Name is not null)
             account.Name = request.Name.Trim();
 

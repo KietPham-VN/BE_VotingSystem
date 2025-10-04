@@ -387,31 +387,72 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     private static (bool IsValid, List<string> Errors) ValidateHeaderRow(ExcelWorksheet worksheet)
     {
         var errors = new List<string>();
-        var requiredHeaders = new[] { "AccountName", "Name", "Email", "Department", "Quote", "AvatarUrl" };
+        var requiredHeaders = new[] { "Account", "Họ tên", "Email", "Bộ môn", "Câu nói truyền cảm hứng" };
 
-        for (var col = 1; col <= requiredHeaders.Length; col++)
+        // Find the actual headers in the Excel file
+        var actualHeaders = new List<string>();
+        var headerMap = new Dictionary<string, int>();
+        
+        var columnCount = worksheet.Dimension?.Columns ?? 0;
+        for (var col = 1; col <= columnCount; col++)
         {
             var headerValue = worksheet.Cells[1, col].Value?.ToString()?.Trim();
-            if (string.IsNullOrEmpty(headerValue) || !requiredHeaders.Contains(headerValue))
+            if (!string.IsNullOrEmpty(headerValue))
             {
-                errors.Add($"Column {col} should be '{requiredHeaders[col - 1]}' but found '{headerValue}'");
+                actualHeaders.Add(headerValue);
+                headerMap[headerValue] = col;
             }
         }
+
+        // Check if all required headers are present
+        var missingHeaders = requiredHeaders.Where(h => !headerMap.ContainsKey(h)).ToList();
+        if (missingHeaders.Any())
+        {
+            errors.Add($"Missing required headers: {string.Join(", ", missingHeaders)}");
+        }
+
+        // Commenting out unexpected headers check to allow extra columns
+        // var unexpectedHeaders = actualHeaders.Where(h => !requiredHeaders.Contains(h)).ToList();
+        // if (unexpectedHeaders.Any())
+        // {
+        //     errors.Add($"Found unexpected headers: {string.Join(", ", unexpectedHeaders)}");
+        // }
 
         return (errors.Count == 0, errors);
     }
 
     private static LecturerData ExtractLecturerData(ExcelWorksheet worksheet, int row)
     {
+        // Create header mapping
+        var headerMap = new Dictionary<string, int>();
+        var columnCount = worksheet.Dimension?.Columns ?? 0;
+        for (var col = 1; col <= columnCount; col++)
+        {
+            var headerValue = worksheet.Cells[1, col].Value?.ToString()?.Trim();
+            if (!string.IsNullOrEmpty(headerValue))
+            {
+                headerMap[headerValue] = col;
+            }
+        }
+
         return new LecturerData
         {
-            AccountName = worksheet.Cells[row, 1].Value?.ToString(),
-            Name = worksheet.Cells[row, 2].Value?.ToString(),
-            Email = worksheet.Cells[row, 3].Value?.ToString(),
-            Department = worksheet.Cells[row, 4].Value?.ToString(),
-            Quote = worksheet.Cells[row, 5].Value?.ToString(),
-            AvatarUrl = worksheet.Cells[row, 6].Value?.ToString()
+            AccountName = GetCellValue(worksheet, row, headerMap, "Account"),
+            Name = GetCellValue(worksheet, row, headerMap, "Họ tên"),
+            Email = GetCellValue(worksheet, row, headerMap, "Email"),
+            Department = GetCellValue(worksheet, row, headerMap, "Bộ môn"),
+            Quote = GetCellValue(worksheet, row, headerMap, "Câu nói truyền cảm hứng"),
+            AvatarUrl = null // No avatar column in the 5-column sheet
         };
+    }
+
+    private static string? GetCellValue(ExcelWorksheet worksheet, int row, Dictionary<string, int> headerMap, string headerName)
+    {
+        if (headerMap.TryGetValue(headerName, out var column))
+        {
+            return worksheet.Cells[row, column].Value?.ToString();
+        }
+        return null;
     }
 
     private static (bool IsValid, List<RowError> RowErrors) ValidateLecturerData(LecturerData data, int rowNumber)

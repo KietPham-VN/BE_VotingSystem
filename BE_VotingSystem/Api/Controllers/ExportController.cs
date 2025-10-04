@@ -27,6 +27,7 @@ public class ExportController : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Excel file containing all voting data</returns>
     [HttpGet("voting-report")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetVotingReport(CancellationToken cancellationToken = default)
@@ -51,6 +52,7 @@ public class ExportController : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Excel file containing lecturer data</returns>
     [HttpGet("lecturer-report")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetLecturerReport(CancellationToken cancellationToken = default)
@@ -75,6 +77,7 @@ public class ExportController : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Excel file containing feedback data</returns>
     [HttpGet("feedback-report")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFeedbackReport(CancellationToken cancellationToken = default)

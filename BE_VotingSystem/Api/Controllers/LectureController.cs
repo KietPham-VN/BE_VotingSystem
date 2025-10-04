@@ -63,6 +63,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse<Lecturer>>> CreateLecture(
         [FromBody] CreateLecturerRequest request,
         CancellationToken cancellationToken = default)
@@ -89,6 +90,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse<Lecturer>>> UpdateLecture(
         Guid id,
         [FromBody] CreateLecturerRequest request,
@@ -113,6 +115,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse>> DeleteLecture(
         Guid id,
         CancellationToken cancellationToken = default)
@@ -135,6 +138,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse>> ActivateLecturer(
         Guid id,
         CancellationToken cancellationToken = default)
@@ -164,6 +168,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse>> DeactivateLecturer(
         Guid id,
         CancellationToken cancellationToken = default)
@@ -193,6 +198,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<ApiResponse<ImportLecturersResponse>>> ImportLecturers(
         [FromForm] ImportLecturersRequest request,
         CancellationToken cancellationToken = default)
@@ -265,6 +271,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminOnly")]
     public IActionResult DownloadImportTemplate()
     {
         try

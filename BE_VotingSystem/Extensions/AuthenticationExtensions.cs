@@ -62,4 +62,27 @@ public static class AuthenticationExtensions
 
         return services;
     }
+
+    /// <summary>
+    ///     Adds authorization policies including admin-only access
+    /// </summary>
+    /// <param name="services">The service collection to add services to</param>
+    /// <returns>The service collection for chaining</returns>
+    public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminOnly", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireAssertion(context =>
+                {
+                    var isAdminClaim = context.User.FindFirst("isAdmin");
+                    return isAdminClaim?.Value == "True";
+                });
+            });
+        });
+
+        return services;
+    }
 }

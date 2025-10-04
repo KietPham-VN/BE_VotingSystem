@@ -13,6 +13,16 @@ namespace BE_VotingSystem.Api.Controllers;
 public class AccountController(IAccountService accountService) : ControllerBase
 {
     /// <summary>
+    ///     Extracts user ID from JWT claims
+    /// </summary>
+    /// <returns>User ID from claims</returns>
+    private static Guid GetCurrentUserId(ClaimsPrincipal user)
+    {
+        var sub = user.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? user.FindFirstValue(ClaimTypes.NameIdentifier);
+        return string.IsNullOrEmpty(sub) ? Guid.Empty : Guid.Parse(sub);
+    }
+
+    /// <summary>
     ///     Gets all accounts
     /// </summary>
     /// <param name="ct">Cancellation token</param>
@@ -54,10 +64,11 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [HttpPut("{id:guid}")]
     [SwaggerOperation(
         Summary = "Update an account",
-        Description = "Updates account information. Requires admin privileges.")]
+        Description = "Updates account information. Basic fields can be updated by any authorized user. Admin privileges (IsAdmin field) can only be granted/revoked by existing admin users.")]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse<AccountDto>>> UpdateAccount(
@@ -66,7 +77,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        var account = await accountService.UpdateAccountAsync(id, request, cancellationToken);
+        var currentUserId = GetCurrentUserId(User);
+        var account = await accountService.UpdateAccountAsync(id, request, currentUserId, cancellationToken);
         return Ok(new ApiResponse<AccountDto>(account, "Account updated successfully"));
     }
 
@@ -77,11 +89,13 @@ public class AccountController(IAccountService accountService) : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>No content</returns> api/accounts/id
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "AdminOnly")]
     [SwaggerOperation(
         Summary = "Delete an account",
         Description = "Deletes an account by ID. Cannot delete admin accounts. Requires admin privileges.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -102,12 +116,14 @@ public class AccountController(IAccountService accountService) : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated account</returns>
     [HttpPatch("{id:guid}/ban")]
+    [Authorize(Policy = "AdminOnly")]
     [SwaggerOperation(
         Summary = "Ban or unban an account",
         Description = "Bans or unbans an account. Cannot ban admin accounts. Requires admin privileges.")]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse<AccountDto>>> BanAccount(

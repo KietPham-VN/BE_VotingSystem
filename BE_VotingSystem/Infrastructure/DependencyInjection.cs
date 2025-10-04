@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddGoogleAuthConfiguration(configuration);
         services.AddHangfireConfiguration(configuration);
         services.AddAuthorization();
+        services.AddAuthorizationPolicies();
 
         services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();

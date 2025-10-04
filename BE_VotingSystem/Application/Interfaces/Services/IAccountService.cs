@@ -27,9 +27,10 @@ public interface IAccountService
     /// </summary>
     /// <param name="id">Account ID to update</param>
     /// <param name="request">Update request containing new account information</param>
+    /// <param name="currentUserId">ID of the current user performing the update</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated account DTO</returns>
-    Task<AccountDto> UpdateAccountAsync(Guid id, UpdateAccountRequest request,
+    Task<AccountDto> UpdateAccountAsync(Guid id, UpdateAccountRequest request, Guid currentUserId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
