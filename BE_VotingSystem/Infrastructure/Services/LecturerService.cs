@@ -46,6 +46,9 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             SortBy.Email => orderBy == OrderBy.Asc
                 ? query.OrderBy(l => l.Email)
                 : query.OrderByDescending(l => l.Email),
+            SortBy.AccountName => orderBy == OrderBy.Asc
+                ? query.OrderBy(l => l.AccountName)
+                : query.OrderByDescending(l => l.AccountName),
             _ => query.OrderBy(l => l.Name)
         };
 
@@ -71,6 +74,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             .Select(l => new
             {
                 l.Id,
+                l.AccountName,
                 l.Name,
                 l.Email,
                 l.Department,
@@ -98,6 +102,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                 var weightedVotes = l.Votes * weight;
                 return new LecturerDto(
                     l.Id,
+                    l.AccountName ?? string.Empty,
                     l.Name ?? string.Empty,
                     l.Email ?? string.Empty,
                     department,
@@ -137,6 +142,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
         var lecture = new Lecturer
         {
+            AccountName = request.AccountName?.Trim(),
             Name = request.Name.Trim(),
             Email = request.Email.Trim(),
             Department = request.Department.Trim(),
@@ -170,6 +176,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         if (existingLecture is not null)
             throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
 
+        lecture.AccountName = request.AccountName?.Trim();
         lecture.Name = request.Name.Trim();
         lecture.Email = request.Email.Trim();
         lecture.Department = request.Department.Trim();

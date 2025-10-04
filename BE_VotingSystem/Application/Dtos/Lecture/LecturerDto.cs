@@ -4,6 +4,7 @@
 ///     Data transfer object for lecturer information
 /// </summary>
 /// <param name="Id">Unique identifier for the lecturer</param>
+/// <param name="AccountName">Account name of the lecturer for the uni system</param>
 /// <param name="Name">Full name of the lecturer</param>
 /// <param name="Email">Lecturer's email</param>
 /// <param name="Department">Department the lecturer belongs to</param>
@@ -13,6 +14,7 @@
 /// <param name="IsVoted">Whether the current account has voted for this lecturer today</param>
 public sealed record LecturerDto(
     Guid Id,
+    string AccountName,
     string Name,
     string Email,
     string Department,

@@ -23,5 +23,10 @@ public enum SortBy
     /// <summary>
     /// Sort by email
     /// </summary>
-    Email
+    Email,
+    
+    /// <summary>
+    /// Sort by account name
+    /// </summary>
+    AccountName
 }

@@ -20,7 +20,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     ///     Get all lectures
     /// </summary>
     /// <param name="isActive">Optional filter: true for active, false for inactive, null for all</param>
-    /// <param name="sortBy">Sort by field: Name, Votes, Department, Email (default: Name)</param>
+    /// <param name="sortBy">Sort by field: Name, Votes, Department, Email, AccountName (default: Name)</param>
     /// <param name="order">Order direction: asc for ascending, desc for descending (default: asc)</param>
     /// <param name="top">Number of records to return (default: all)</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -34,7 +34,7 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse<List<LecturerDto>>>> GetLectures(
         [FromQuery, SwaggerParameter(Description = "Filter by activity status: true=active, false=inactive; omit for all")] bool? isActive,
-        [FromQuery, SwaggerParameter(Description = "Sort by field: Name, Votes, Department, Email (default: Name)")] SortBy sortBy = SortBy.Name,
+        [FromQuery, SwaggerParameter(Description = "Sort by field: Name, Votes, Department, Email, AccountName (default: Name)")] SortBy sortBy = SortBy.Name,
         [FromQuery, SwaggerParameter(Description = "Order direction: asc for ascending, desc for descending (default: asc)")] OrderBy order = OrderBy.Desc,
         [FromQuery, SwaggerParameter(Description = "Number of records to return (default: all)")] int? top = null,
         CancellationToken cancellationToken = default)

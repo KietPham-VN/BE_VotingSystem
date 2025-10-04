@@ -12,6 +12,12 @@ public class CreateLecturerRequestValidator : AbstractValidator<CreateLecturerRe
     /// </summary>
     public CreateLecturerRequestValidator()
     {
+        RuleFor(x => x.AccountName)
+            .MaximumLength(255).WithMessage("Account name cannot exceed 255 characters.")
+            .Must(accountName => string.IsNullOrEmpty(accountName) || !string.IsNullOrWhiteSpace(accountName))
+            .WithMessage("Account name cannot be empty or whitespace.")
+            .When(x => !string.IsNullOrEmpty(x.AccountName));
+
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Lecturer name is required.")
             .MaximumLength(255).WithMessage("Lecturer name cannot exceed 255 characters.")
