@@ -69,7 +69,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             throw new ForbiddenException("You can only update your own account");
 
         // Only admins can change admin status
-        if (request.IsAdmin.HasValue && !isAdmin)
+        if (request.IsAdmin == true && !isAdmin)
             throw new ForbiddenException("Only admin users can grant or revoke admin privileges");
 
         if (request.Name is not null)
@@ -85,7 +85,6 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
             account.Department = request.Department.Trim();
         if (isAdmin && request.IsAdmin.HasValue)
             account.IsAdmin = request.IsAdmin.Value;
-
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
