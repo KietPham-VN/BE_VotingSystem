@@ -50,21 +50,27 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
     public async Task<AccountDto> UpdateAccountAsync(Guid id, UpdateAccountRequest request, Guid currentUserId,
         CancellationToken cancellationToken = default)
     {
+        // Load current user to evaluate permissions
+        var currentUser = await dbContext.Accounts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == currentUserId, cancellationToken);
+
         var account = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
         if (account is null)
             throw new InvalidOperationException($"Account with ID '{id}' not found");
 
-        // If trying to change admin status, verify current user is admin
-        if (request.IsAdmin.HasValue)
-        {
-            var currentUser = await dbContext.Accounts
-                .FirstOrDefaultAsync(a => a.Id == currentUserId, cancellationToken);
+        var isAdmin = currentUser?.IsAdmin == true;
+        var isUpdatingSelf = id == currentUserId;
 
-            if (currentUser?.IsAdmin != true)
-                throw new ForbiddenException("Only admin users can grant or revoke admin privileges");
-        }
+        // Non-admins may only update their own account
+        if (!isAdmin && !isUpdatingSelf)
+            throw new ForbiddenException("You can only update your own account");
+
+        // Only admins can change admin status
+        if (request.IsAdmin.HasValue && !isAdmin)
+            throw new ForbiddenException("Only admin users can grant or revoke admin privileges");
 
         if (request.Name is not null)
             account.Name = request.Name.Trim();
@@ -77,7 +83,7 @@ public class AccountService(IAppDbContext dbContext) : IAccountService
 
         if (request.Department is not null)
             account.Department = request.Department.Trim();
-        if (request.IsAdmin.HasValue)
+        if (isAdmin && request.IsAdmin.HasValue)
             account.IsAdmin = request.IsAdmin.Value;
 
 
