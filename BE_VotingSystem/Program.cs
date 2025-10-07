@@ -53,6 +53,8 @@ TaskScheduler.UnobservedTaskException += (sender, args) =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "https://gvtch2025.vercel.app" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Development", policy =>
@@ -61,6 +63,14 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .AllowAnyHeader()
               .SetIsOriginAllowed(origin => true);
+    });
+    
+    options.AddPolicy("Production", policy =>
+    {
+        policy.WithOrigins(corsOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -144,6 +154,10 @@ if (app.Environment.IsDevelopment())
     
     app.UseCors("Development");
 }
+else
+{
+    app.UseCors("Production");
+}
 
 app.UseHttpsRedirection();
 
@@ -152,10 +166,6 @@ app.Use(async (context, next) =>
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
     context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-    
-    context.Response.Headers["Access-Control-Allow-Origin"] = "*";
-    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-    context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
     
     await next();
 });
