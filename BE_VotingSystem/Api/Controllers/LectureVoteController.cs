@@ -53,7 +53,11 @@ public sealed class LectureVoteController(ILectureVoteService service) : Control
     }
 
     /// <summary>
-    ///     Cast a vote for the lecture. Max 3/day per account, max 1/day per lecture
+    ///     Cast a vote for the lecture. Max 3/day per account, max 1/day per lecture.
+    ///     Semester-based voting rules:
+    ///     - Semester 0: Can only vote for basic subject lecturers (Tiếng Anh dự bị, Âm nhạc Truyền thống, Kỹ năng mềm, Giáo dục thể chất, Toán)
+    ///     - Semester 1-6: Can vote 1 basic subject lecturer + 2 specialized subject lecturers per day
+    ///     - Semester 7-9: Can only vote for specialized subject lecturers (Kỹ thuật phần mềm, An toàn thông tin, Trí tuệ nhân tạo, etc.)
     /// </summary>
     [HttpPost]
     [SwaggerOperation(Summary = "Vote for a lecture")]

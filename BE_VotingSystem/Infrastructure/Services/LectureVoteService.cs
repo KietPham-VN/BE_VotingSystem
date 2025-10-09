@@ -8,6 +8,43 @@ using BE_VotingSystem.Domain.Entities;
 namespace BE_VotingSystem.Infrastructure.Services;
 
 /// <summary>
+///     Department categories for semester-based voting rules
+/// </summary>
+public static class DepartmentCategories
+{
+    /// <summary>
+    ///     Basic subjects departments - can be voted by semester 0 and 1-6
+    /// </summary>
+    public static readonly HashSet<string> BasicSubjects = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Tiếng Anh dự bị",
+        "Âm nhạc Truyền thống", 
+        "Kỹ năng mềm",
+        "Giáo dục thể chất",
+        "Toán"
+    };
+
+    /// <summary>
+    ///     Specialized subjects departments - can be voted by semester 1-6 and 7-9
+    /// </summary>
+    public static readonly HashSet<string> SpecializedSubjects = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Kỹ thuật phần mềm",
+        "An toàn thông tin",
+        "Trí tuệ nhân tạo",
+        "Hệ thống thông tin",
+        "Nền tảng máy tính",
+        "Quản trị doanh nghiệp",
+        "Phát triển khởi nghiệp",
+        "Công nghệ truyền thông",
+        "Thiết kế mỹ thuật số",
+        "Tiếng Anh",
+        "Tiếng Nhật",
+        "Chính trị"
+    };
+}
+
+/// <summary>
 ///     Service implementation for lecturer voting
 /// </summary>
 public sealed class LectureVoteService(IAppDbContext db) : ILectureVoteService
@@ -41,15 +78,17 @@ public sealed class LectureVoteService(IAppDbContext db) : ILectureVoteService
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        // Check lecturer exists and active
-        var lectureExists = await db.Lectures.AsNoTracking()
-            .AnyAsync(l => l.Id == request.LectureId && l.IsActive, cancellationToken);
-        if (!lectureExists) throw new InvalidOperationException("Lecturer not found or inactive");
-
-        // Ensure account has remaining votes today
+        // Get account and lecturer information
         var account = await db.Accounts.FirstAsync(a => a.Id == accountId, cancellationToken);
         if (account.IsBanned) throw new InvalidOperationException("Account is banned");
         if (account.VotesRemain <= 0) throw new InvalidOperationException("No votes remaining today");
+
+        var lecturer = await db.Lectures.AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Id == request.LectureId && l.IsActive, cancellationToken);
+        if (lecturer is null) throw new InvalidOperationException("Lecturer not found or inactive");
+
+        // Validate semester-based voting rules
+        await ValidateSemesterBasedVotingAsync(account, lecturer, today, cancellationToken);
 
         // Ensure not already voted for this lecturer today
         var alreadyVotedThisLecture = await db.LectureVotes.AsNoTracking()
@@ -66,6 +105,66 @@ public sealed class LectureVoteService(IAppDbContext db) : ILectureVoteService
         account.VotesRemain--;
         await db.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    /// <summary>
+    ///     Validates semester-based voting rules
+    /// </summary>
+    /// <param name="account">The account attempting to vote</param>
+    /// <param name="lecturer">The lecturer being voted for</param>
+    /// <param name="today">Today's date</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <exception cref="InvalidOperationException">Thrown when voting rules are violated</exception>
+    private async Task ValidateSemesterBasedVotingAsync(Account account, Lecturer lecturer, DateOnly today,
+        CancellationToken cancellationToken)
+    {
+        // If semester is null, allow voting (for backward compatibility)
+        if (account.Semester is null) return;
+
+        var semester = account.Semester.Value;
+        var lecturerDepartment = lecturer.Department;
+
+        // Get today's votes for this account
+        var todayVotes = await db.LectureVotes.AsNoTracking()
+            .Where(v => v.AccountId == account.Id && v.VotedAt == today)
+            .Join(db.Lectures.AsNoTracking(), v => v.LectureId, l => l.Id, (v, l) => l.Department)
+            .ToListAsync(cancellationToken);
+
+        var basicVotesToday = todayVotes.Count(d => DepartmentCategories.BasicSubjects.Contains(d));
+        var specializedVotesToday = todayVotes.Count(d => DepartmentCategories.SpecializedSubjects.Contains(d));
+
+        switch (semester)
+        {
+            case 0: // Semester 0: Can only vote for basic subjects
+                if (!DepartmentCategories.BasicSubjects.Contains(lecturerDepartment))
+                    throw new InvalidOperationException("Semester 0 students can only vote for basic subject lecturers");
+                break;
+
+            case >= 1 and <= 6: // Semester 1-6: Can vote 1 basic + 2 specialized
+                if (DepartmentCategories.BasicSubjects.Contains(lecturerDepartment))
+                {
+                    if (basicVotesToday >= 1)
+                        throw new InvalidOperationException("Semester 1-6 students can only vote for 1 basic subject lecturer per day");
+                }
+                else if (DepartmentCategories.SpecializedSubjects.Contains(lecturerDepartment))
+                {
+                    if (specializedVotesToday >= 2)
+                        throw new InvalidOperationException("Semester 1-6 students can only vote for 2 specialized subject lecturers per day");
+                }
+                else
+                {
+                    throw new InvalidOperationException("Lecturer department is not recognized for voting");
+                }
+                break;
+
+            case >= 7 and <= 9: // Semester 7-9: Can only vote for specialized subjects
+                if (!DepartmentCategories.SpecializedSubjects.Contains(lecturerDepartment))
+                    throw new InvalidOperationException("Semester 7-9 students can only vote for specialized subject lecturers");
+                break;
+
+            default:
+                throw new InvalidOperationException($"Invalid semester value: {semester}");
+        }
     }
 
     /// <inheritdoc />
