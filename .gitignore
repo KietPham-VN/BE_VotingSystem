@@ -14,3 +14,7 @@ appsettings.json
 !.env.example
 /.cursor
 .vscode/
+
+# Logs
+logs/
+*.log
