@@ -28,20 +28,28 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [HttpGet]
     [SwaggerOperation(
         Summary = "Get all lectures",
-        Description = "Retrieves a list of lectures with their vote information. Supports filtering by activity status, sorting by various fields, and limiting results.")]
+        Description =
+            "Retrieves a list of lectures with their vote information. Supports filtering by activity status, sorting by various fields, and limiting results.")]
     [ProducesResponseType(typeof(ApiResponse<List<LecturerDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse<List<LecturerDto>>>> GetLectures(
-        [FromQuery, SwaggerParameter(Description = "Filter by activity status: true=active, false=inactive; omit for all")] bool? isActive,
-        [FromQuery, SwaggerParameter(Description = "Sort by field: Name, Votes, Department, Email, AccountName (default: Name)")] SortBy sortBy = SortBy.Name,
-        [FromQuery, SwaggerParameter(Description = "Order direction: asc for ascending, desc for descending (default: asc)")] OrderBy order = OrderBy.Desc,
-        [FromQuery, SwaggerParameter(Description = "Number of records to return (default: all)")] int? top = null,
+        [FromQuery]
+        [SwaggerParameter(Description = "Filter by activity status: true=active, false=inactive; omit for all")]
+        bool? isActive,
+        [FromQuery]
+        [SwaggerParameter(Description = "Sort by field: Name, Votes, Department, Email, AccountName (default: Name)")]
+        SortBy sortBy = SortBy.Name,
+        [FromQuery]
+        [SwaggerParameter(Description = "Order direction: asc for ascending, desc for descending (default: asc)")]
+        OrderBy order = OrderBy.Desc,
+        [FromQuery] [SwaggerParameter(Description = "Number of records to return (default: all)")]
+        int? top = null,
         CancellationToken cancellationToken = default)
     {
         Guid? accountId = null;
-        var sub = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)
-                  ?? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+        var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                  ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (Guid.TryParse(sub, out var parsed)) accountId = parsed;
 
         var lectures = await service.GetLecturers(accountId, isActive, sortBy, order, top, cancellationToken);
@@ -67,12 +75,12 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
         CancellationToken cancellationToken = default)
     {
         Guid? accountId = null;
-        var sub = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)
-                  ?? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+        var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                  ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (Guid.TryParse(sub, out var parsed)) accountId = parsed;
 
         var lecturer = await service.GetLecturerById(id, accountId, cancellationToken);
-        
+
         if (lecturer == null)
             return NotFound(new ApiResponse<LecturerDto>(null!, "Lecturer not found"));
 
@@ -224,7 +232,8 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [HttpPost("import")]
     [SwaggerOperation(
         Summary = "Import lecturers from Excel",
-        Description = "Imports multiple lecturers from an Excel file (.xlsx or .xls). The Excel file must contain columns: AccountName, Name, Email, Department, Quote, AvatarUrl. Requires admin privileges.")]
+        Description =
+            "Imports multiple lecturers from an Excel file (.xlsx or .xls). The Excel file must contain columns: AccountName, Name, Email, Department, Quote, AvatarUrl. Requires admin privileges.")]
     [ProducesResponseType(typeof(ApiResponse<ImportLecturersResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -237,7 +246,8 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
         var logger = HttpContext.RequestServices.GetRequiredService<ILogger<LectureController>>();
         var correlationId = HttpContext.Items["CorrelationId"]?.ToString() ?? Guid.NewGuid().ToString();
 
-        logger.LogInformation("Import lecturers request started - File: {FileName}, Size: {FileSize} bytes, ContentType: {ContentType} - CorrelationId: {CorrelationId}",
+        logger.LogInformation(
+            "Import lecturers request started - File: {FileName}, Size: {FileSize} bytes, ContentType: {ContentType} - CorrelationId: {CorrelationId}",
             request.File?.FileName,
             request.File?.Length,
             request.File?.ContentType,
@@ -251,14 +261,16 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
             logger.LogWarning("Import validation failed - Errors: {Errors} - CorrelationId: {CorrelationId}",
                 string.Join(", ", errors),
                 correlationId);
-            return BadRequest(new ApiResponse<ImportLecturersResponse>(null!, $"Validation failed: {string.Join(", ", errors)}"));
+            return BadRequest(
+                new ApiResponse<ImportLecturersResponse>(null!, $"Validation failed: {string.Join(", ", errors)}"));
         }
 
         try
         {
             logger.LogInformation("Starting Excel import process - CorrelationId: {CorrelationId}", correlationId);
             var result = await service.ImportLecturersFromExcel(request.File, cancellationToken);
-            logger.LogInformation("Excel import completed - Success: {IsSuccess}, Imported: {ImportedCount}, Failed: {FailedCount} - CorrelationId: {CorrelationId}",
+            logger.LogInformation(
+                "Excel import completed - Success: {IsSuccess}, Imported: {ImportedCount}, Failed: {FailedCount} - CorrelationId: {CorrelationId}",
                 result.IsSuccess,
                 result.ImportedCount,
                 result.FailedCount,
@@ -272,17 +284,16 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
 
                 return Ok(new ApiResponse<ImportLecturersResponse>(result, message));
             }
-            else
-            {
-                var errorMessage = result.Errors.Any()
-                    ? $"Import failed: {string.Join(", ", result.Errors)}"
-                    : "Import failed";
-                return BadRequest(new ApiResponse<ImportLecturersResponse>(result, errorMessage));
-            }
+
+            var errorMessage = result.Errors.Count != 0
+                ? $"Import failed: {string.Join(", ", result.Errors)}"
+                : "Import failed";
+            return BadRequest(new ApiResponse<ImportLecturersResponse>(result, errorMessage));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Import lecturers failed - File: {FileName}, Size: {FileSize} bytes - CorrelationId: {CorrelationId}",
+            logger.LogError(ex,
+                "Import lecturers failed - File: {FileName}, Size: {FileSize} bytes - CorrelationId: {CorrelationId}",
                 request.File?.FileName,
                 request.File?.Length,
                 correlationId);
@@ -298,7 +309,8 @@ public class LectureController(ILecturerService service, IValidator<ImportLectur
     [HttpGet("import-template")]
     [SwaggerOperation(
         Summary = "Download lecturer import template",
-        Description = "Downloads an Excel template file with the correct format for importing lecturers. The template includes sample data and column headers.")]
+        Description =
+            "Downloads an Excel template file with the correct format for importing lecturers. The template includes sample data and column headers.")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

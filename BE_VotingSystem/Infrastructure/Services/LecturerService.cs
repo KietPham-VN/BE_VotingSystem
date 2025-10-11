@@ -1,4 +1,5 @@
-﻿using BE_VotingSystem.Application.Dtos.Lecture;
+﻿using System.Net.Mail;
+using BE_VotingSystem.Application.Dtos.Lecture;
 using BE_VotingSystem.Application.Dtos.Lecture.Requests;
 using BE_VotingSystem.Application.Interfaces;
 using BE_VotingSystem.Application.Interfaces.Services;
@@ -62,13 +63,11 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         // Preload today's votes for current account if provided
         Dictionary<Guid, bool> lecturerIdToVoted = new();
         if (currentAccountId.HasValue)
-        {
             lecturerIdToVoted = await context.LectureVotes.AsNoTracking()
                 .Where(v => v.AccountId == currentAccountId.Value && v.VotedAt == today)
                 .GroupBy(v => v.LectureId)
                 .Select(g => new { LectureId = g.Key })
                 .ToDictionaryAsync(x => x.LectureId, _ => true, cancellationToken);
-        }
 
         var list = await query
             .Select(l => new
@@ -117,8 +116,8 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         if (sortBy == SortBy.Votes)
         {
             dtos = (orderBy == OrderBy.Asc
-                ? dtos.OrderBy(d => d.Votes).ThenBy(d => d.Name)
-                : dtos.OrderByDescending(d => d.Votes).ThenBy(d => d.Name))
+                    ? dtos.OrderBy(d => d.Votes).ThenBy(d => d.Name)
+                    : dtos.OrderByDescending(d => d.Votes).ThenBy(d => d.Name))
                 .ToList();
 
             if (applyTopAfterWeighting)
@@ -129,7 +128,8 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     }
 
     /// <inheritdoc />
-    public async Task<LecturerDto?> GetLecturerById(Guid id, Guid? currentAccountId = null, CancellationToken cancellationToken = default)
+    public async Task<LecturerDto?> GetLecturerById(Guid id, Guid? currentAccountId = null,
+        CancellationToken cancellationToken = default)
     {
         var lecturer = await context.Lectures
             .AsNoTracking()
@@ -140,15 +140,13 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             return null;
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        bool hasVoted = false;
+        var hasVoted = false;
 
         if (currentAccountId.HasValue)
-        {
             hasVoted = await context.LectureVotes.AsNoTracking()
-                .AnyAsync(v => v.AccountId == currentAccountId.Value && 
-                             v.LectureId == id && 
-                             v.VotedAt == today, cancellationToken);
-        }
+                .AnyAsync(v => v.AccountId == currentAccountId.Value &&
+                               v.LectureId == id &&
+                               v.VotedAt == today, cancellationToken);
 
         // Calculate weighted votes (same logic as GetLecturers)
         var onePointDepartments = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -184,11 +182,12 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     {
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
-                l => l.Name != null && EF.Functions.Collate(l.Name, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.Name, CollationUtf8Mb4UnicodeCi),
+                l => l.AccountName != null && EF.Functions.Collate(l.AccountName, CollationUtf8Mb4UnicodeCi) ==
+                    EF.Functions.Collate(request.AccountName, CollationUtf8Mb4UnicodeCi),
                 cancellationToken);
 
         if (existingLecture is not null)
-            throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
+            throw new InvalidOperationException($"Lecturer with Account name '{request.AccountName}' already exists");
 
         var lecture = new Lecturer
         {
@@ -218,13 +217,12 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
-                l => l.Id != id &&
-                     l.Name != null &&
-                     EF.Functions.Collate(l.Name, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.Name, CollationUtf8Mb4UnicodeCi),
+                l => l.AccountName != null && EF.Functions.Collate(l.AccountName, CollationUtf8Mb4UnicodeCi) ==
+                    EF.Functions.Collate(request.AccountName, CollationUtf8Mb4UnicodeCi),
                 cancellationToken);
 
         if (existingLecture is not null)
-            throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
+            throw new InvalidOperationException($"Lecturer with Account name '{request.AccountName}' already exists");
 
         lecture.AccountName = request.AccountName?.Trim();
         lecture.Name = request.Name.Trim();
@@ -279,7 +277,8 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     }
 
     /// <inheritdoc />
-    public async Task<ImportLecturersResponse> ImportLecturersFromExcel(IFormFile file, CancellationToken cancellationToken = default)
+    public async Task<ImportLecturersResponse> ImportLecturersFromExcel(IFormFile file,
+        CancellationToken cancellationToken = default)
     {
         var response = new ImportLecturersResponse();
         var lecturersToAdd = new List<Lecturer>();
@@ -326,7 +325,6 @@ public class LecturerService(IAppDbContext context) : ILecturerService
             var processedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             for (var i = 2; i <= rowCount; i++)
-            {
                 try
                 {
                     var lecturerData = ExtractLecturerData(worksheet, i);
@@ -340,7 +338,6 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                     }
 
                     // After clearing existing data, only validate duplicates within the current batch
-
                     if (!string.IsNullOrWhiteSpace(lecturerData.Email))
                     {
                         if (processedEmails.Contains(lecturerData.Email))
@@ -354,6 +351,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                             response.FailedCount++;
                             continue;
                         }
+
                         processedEmails.Add(lecturerData.Email);
                     }
 
@@ -370,6 +368,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                             response.FailedCount++;
                             continue;
                         }
+
                         processedNames.Add(lecturerData.Name);
                     }
 
@@ -405,10 +404,8 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                     });
                     response.FailedCount++;
                 }
-            }
 
             if (lecturersToAdd.Any())
-            {
                 try
                 {
                     context.Lectures.AddRange(lecturersToAdd);
@@ -429,7 +426,6 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                         throw;
                     }
                 }
-            }
 
             response.IsSuccess = response.ImportedCount > 0;
             return response;
@@ -449,7 +445,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         // Find the actual headers in the Excel file
         var actualHeaders = new List<string>();
         var headerMap = new Dictionary<string, int>();
-        
+
         var columnCount = worksheet.Dimension?.Columns ?? 0;
         for (var col = 1; col <= columnCount; col++)
         {
@@ -463,17 +459,9 @@ public class LecturerService(IAppDbContext context) : ILecturerService
 
         // Check if all required headers are present
         var missingHeaders = requiredHeaders.Where(h => !headerMap.ContainsKey(h)).ToList();
-        if (missingHeaders.Any())
-        {
-            errors.Add($"Missing required headers: {string.Join(", ", missingHeaders)}");
-        }
+        if (missingHeaders.Count != 0) errors.Add($"Missing required headers: {string.Join(", ", missingHeaders)}");
 
-        // Commenting out unexpected headers check to allow extra columns
-        // var unexpectedHeaders = actualHeaders.Where(h => !requiredHeaders.Contains(h)).ToList();
-        // if (unexpectedHeaders.Any())
-        // {
-        //     errors.Add($"Found unexpected headers: {string.Join(", ", unexpectedHeaders)}");
-        // }
+
 
         return (errors.Count == 0, errors);
     }
@@ -486,10 +474,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         for (var col = 1; col <= columnCount; col++)
         {
             var headerValue = worksheet.Cells[1, col].Value?.ToString()?.Trim();
-            if (!string.IsNullOrEmpty(headerValue))
-            {
-                headerMap[headerValue] = col;
-            }
+            if (!string.IsNullOrEmpty(headerValue)) headerMap[headerValue] = col;
         }
 
         return new LecturerData
@@ -503,12 +488,10 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         };
     }
 
-    private static string? GetCellValue(ExcelWorksheet worksheet, int row, Dictionary<string, int> headerMap, string headerName)
+    private static string? GetCellValue(ExcelWorksheet worksheet, int row, Dictionary<string, int> headerMap,
+        string headerName)
     {
-        if (headerMap.TryGetValue(headerName, out var column))
-        {
-            return worksheet.Cells[row, column].Value?.ToString();
-        }
+        if (headerMap.TryGetValue(headerName, out var column)) return worksheet.Cells[row, column].Value?.ToString();
         return null;
     }
 
@@ -522,16 +505,20 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         if (string.IsNullOrWhiteSpace(data.Email))
             errors.Add(new RowError { RowNumber = rowNumber, ErrorMessage = "Email is required", Field = EmailField });
         else if (!IsValidEmail(data.Email))
-            errors.Add(new RowError { RowNumber = rowNumber, ErrorMessage = "Invalid email format", Field = EmailField });
+            errors.Add(new RowError
+                { RowNumber = rowNumber, ErrorMessage = "Invalid email format", Field = EmailField });
 
         if (string.IsNullOrWhiteSpace(data.Department))
-            errors.Add(new RowError { RowNumber = rowNumber, ErrorMessage = "Department is required", Field = "Department" });
+            errors.Add(new RowError
+                { RowNumber = rowNumber, ErrorMessage = "Department is required", Field = "Department" });
 
         if (!string.IsNullOrWhiteSpace(data.Email) && !IsValidEmail(data.Email))
-            errors.Add(new RowError { RowNumber = rowNumber, ErrorMessage = "Invalid email format", Field = EmailField });
+            errors.Add(new RowError
+                { RowNumber = rowNumber, ErrorMessage = "Invalid email format", Field = EmailField });
 
         if (!string.IsNullOrWhiteSpace(data.AvatarUrl) && !IsValidUrl(data.AvatarUrl))
-            errors.Add(new RowError { RowNumber = rowNumber, ErrorMessage = "Invalid URL format", Field = "AvatarUrl" });
+            errors.Add(new RowError
+                { RowNumber = rowNumber, ErrorMessage = "Invalid URL format", Field = "AvatarUrl" });
 
         return (errors.Count == 0, errors);
     }
@@ -540,7 +527,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     {
         try
         {
-            var addr = new System.Net.Mail.MailAddress(email);
+            var addr = new MailAddress(email);
             return addr.Address == email;
         }
         catch
@@ -563,7 +550,6 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         var errors = new List<RowError>();
 
         foreach (var lecturer in lecturers)
-        {
             try
             {
                 context.Lectures.Add(lecturer);
@@ -582,12 +568,8 @@ public class LecturerService(IAppDbContext context) : ILecturerService
                     Field = null
                 });
 
-                if (context is DbContext dbContext)
-                {
-                    dbContext.Entry(lecturer).State = EntityState.Detached;
-                }
+                if (context is DbContext dbContext) dbContext.Entry(lecturer).State = EntityState.Detached;
             }
-        }
 
         return (successCount, failedCount, errors);
     }
