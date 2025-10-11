@@ -145,8 +145,8 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         if (currentAccountId.HasValue)
         {
             hasVoted = await context.LectureVotes.AsNoTracking()
-                .AnyAsync(v => v.AccountId == currentAccountId.Value && 
-                             v.LectureId == id && 
+                .AnyAsync(v => v.AccountId == currentAccountId.Value &&
+                             v.LectureId == id &&
                              v.VotedAt == today, cancellationToken);
         }
 
@@ -184,11 +184,11 @@ public class LecturerService(IAppDbContext context) : ILecturerService
     {
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
-                l => l.Name != null && EF.Functions.Collate(l.Name, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.Name, CollationUtf8Mb4UnicodeCi),
+                l => l.AccountName != null && EF.Functions.Collate(l.AccountName, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.AccountName, CollationUtf8Mb4UnicodeCi),
                 cancellationToken);
 
         if (existingLecture is not null)
-            throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
+            throw new InvalidOperationException($"Lecturer with AccountName '{request.AccountName}' already exists");
 
         var lecture = new Lecturer
         {
@@ -219,12 +219,12 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         var existingLecture = await context.Lectures
             .FirstOrDefaultAsync(
                 l => l.Id != id &&
-                     l.Name != null &&
-                     EF.Functions.Collate(l.Name, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.Name, CollationUtf8Mb4UnicodeCi),
+                     l.AccountName != null &&
+                     EF.Functions.Collate(l.AccountName, CollationUtf8Mb4UnicodeCi) == EF.Functions.Collate(request.AccountName, CollationUtf8Mb4UnicodeCi),
                 cancellationToken);
 
         if (existingLecture is not null)
-            throw new InvalidOperationException($"Lecturer with name '{request.Name}' already exists");
+            throw new InvalidOperationException($"Lecturer with AccountName '{request.AccountName}' already exists");
 
         lecture.AccountName = request.AccountName?.Trim();
         lecture.Name = request.Name.Trim();
@@ -449,7 +449,7 @@ public class LecturerService(IAppDbContext context) : ILecturerService
         // Find the actual headers in the Excel file
         var actualHeaders = new List<string>();
         var headerMap = new Dictionary<string, int>();
-        
+
         var columnCount = worksheet.Dimension?.Columns ?? 0;
         for (var col = 1; col <= columnCount; col++)
         {
