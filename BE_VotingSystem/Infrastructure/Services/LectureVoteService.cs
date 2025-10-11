@@ -33,7 +33,7 @@ public static class DepartmentCategories
         "An toàn thông tin",
         "Trí tuệ nhân tạo",
         "Hệ thống thông tin",
-        "Nền tảng máy tính",
+        "Nền tảng công nghệ thông tin",
         "Quản trị doanh nghiệp",
         "Phát triển khởi nghiệp",
         "Công nghệ truyền thông",
