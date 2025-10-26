@@ -27,21 +27,39 @@ public class ReportService
     /// </summary>
     public async Task<byte[]> GenerateVotingReportAsync(CancellationToken cancellationToken = default)
     {
-        var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
+        try
+        {
+            var templatePath = Path.Combine(environment.ContentRootPath, "Resources", "Templates", "Report.xlsx");
 
-        if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
+            if (!File.Exists(templatePath)) throw new FileNotFoundException($"Template file not found at: {templatePath}");
 
-        using var package = new ExcelPackage(new FileInfo(templatePath));
+            using var package = new ExcelPackage(new FileInfo(templatePath));
 
-        await InspectTemplateStructure(package);
+            await InspectTemplateStructure(package);
 
-        var lecturers = await lecturerService.GetLecturers(cancellationToken: cancellationToken);
-        var feedbackVotes = await feedbackVoteService.GetAllAsync(cancellationToken);
-        var accounts = await accountService.GetAllAsync(cancellationToken);
+            // Fetch all data upfront to avoid N+1 queries
+            var lecturers = await lecturerService.GetLecturers(cancellationToken: cancellationToken);
+            var feedbackVotes = await feedbackVoteService.GetAllAsync(cancellationToken);
+            var accounts = await accountService.GetAllAsync(cancellationToken);
+            
+            // Pre-fetch all lecture votes to avoid N+1 queries
+            var allLectureVotes = new Dictionary<Guid, IReadOnlyList<VoteDto>>();
+            foreach (var lecturer in lecturers)
+            {
+                var votes = await lectureVoteService.GetAllVotesByLectureAsync(lecturer.Id, cancellationToken);
+                allLectureVotes[lecturer.Id] = votes;
+            }
 
-        await FillDataIntoTemplate(package, lecturers, feedbackVotes, accounts, cancellationToken);
+            FillDataIntoTemplate(package, lecturers, feedbackVotes, accounts, allLectureVotes);
 
-        return await package.GetAsByteArrayAsync(cancellationToken);
+            return await package.GetAsByteArrayAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GenerateVotingReportAsync: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            throw;
+        }
     }
 
     /// <summary>
@@ -58,7 +76,7 @@ public class ReportService
         var campaignResultSheet = package.Workbook.Worksheets[0];
 
         var lecturers = await lecturerService.GetLecturers(cancellationToken: cancellationToken);
-        await FillCampaignResultData(campaignResultSheet, lecturers, cancellationToken);
+        FillCampaignResultData(campaignResultSheet, lecturers);
 
         return await package.GetAsByteArrayAsync(cancellationToken);
     }
@@ -85,8 +103,7 @@ public class ReportService
     /// <summary>
     ///     Fills data into Sheet 1: 'CAMPAIGN RESULTS' - Lecturer, Total votes, Notes
     /// </summary>
-    private async Task FillCampaignResultData(ExcelWorksheet worksheet, List<LecturerDto> lecturers,
-        CancellationToken cancellationToken)
+    private static void FillCampaignResultData(ExcelWorksheet worksheet, List<LecturerDto> lecturers)
     {
         const int startRow = 2;
         var currentRow = startRow;
@@ -110,9 +127,9 @@ public class ReportService
     /// <summary>
     ///     Fills data into Sheet 2: 'DETAILED STATISTICS' - Complex layout with departments and statistics
     /// </summary>
-    private async Task FillDetailedStatsData(ExcelWorksheet worksheet, List<LecturerDto> lecturers,
+    private static void FillDetailedStatsData(ExcelWorksheet worksheet, List<LecturerDto> lecturers,
         IReadOnlyList<FeedbackVoteDto> feedbackVotes, IReadOnlyList<AccountDto> accounts,
-        CancellationToken cancellationToken)
+        Dictionary<Guid, IReadOnlyList<VoteDto>> allLectureVotes)
     {
         // Semester-based participant breakdown (Column A labels, Column B counts)
         worksheet.Cells[2, 1].Value = "Giai đoạn chuyên ngành (HK7-HK9)";
@@ -156,8 +173,7 @@ public class ReportService
 
         foreach (var lecturer in lecturers)
         {
-            var votes = await lectureVoteService.GetAllVotesByLectureAsync(lecturer.Id, cancellationToken);
-            if (votes.Count == 0) continue;
+            if (!allLectureVotes.TryGetValue(lecturer.Id, out var votes) || votes.Count == 0) continue;
 
             var weight = onePointDepartments.Contains(lecturer.Department) ? 1 : 2;
             votesSem7to9 += weight * votes.Count(v => sem7to9Emails.Contains(v.Email));
@@ -193,14 +209,14 @@ public class ReportService
         {
             var accountCount = accountDepartment.Count();
 
-            worksheet.Cells[$"F{accountRow}:I{accountRow}"].Merge = true;
-            worksheet.Cells[$"F{accountRow}"].Value = accountDepartment.Key;
-            worksheet.Cells[$"J{accountRow}"].Value = accountCount;
+            // Avoid merging cells; just write values into the starting column to prevent merge conflicts
+            worksheet.Cells[$"F{accountRow}"] .Value = accountDepartment.Key;
+            worksheet.Cells[$"J{accountRow}"] .Value = accountCount;
 
-            worksheet.Cells[$"F{accountRow}"].Style.Font.Size = 11;
-            worksheet.Cells[$"F{accountRow}"].Style.Font.Name = "Calibri";
-            worksheet.Cells[$"J{accountRow}"].Style.Font.Size = 11;
-            worksheet.Cells[$"J{accountRow}"].Style.Font.Name = "Calibri";
+            worksheet.Cells[$"F{accountRow}"] .Style.Font.Size = 11;
+            worksheet.Cells[$"F{accountRow}"] .Style.Font.Name = "Calibri";
+            worksheet.Cells[$"J{accountRow}"] .Style.Font.Size = 11;
+            worksheet.Cells[$"J{accountRow}"] .Style.Font.Name = "Calibri";
 
             accountRow++;
         }
@@ -221,8 +237,8 @@ public class ReportService
     /// <summary>
     ///     Fills data into Sheet 3: 'PARTICIPANTS' - Gmail, Lecturer name 1, 2, 3, ...
     /// </summary>
-    private async Task FillParticipantsData(ExcelWorksheet worksheet, List<LecturerDto> lecturers,
-        IReadOnlyList<AccountDto> accounts, CancellationToken cancellationToken)
+    private static void FillParticipantsData(ExcelWorksheet worksheet, List<LecturerDto> lecturers,
+        IReadOnlyList<AccountDto> accounts, Dictionary<Guid, IReadOnlyList<VoteDto>> allLectureVotes)
     {
         // Build mapping: account email -> list of lecturer names voted (today)
         var nonAdminAccounts = accounts.Where(a => !a.IsAdmin).ToList();
@@ -230,7 +246,8 @@ public class ReportService
 
         foreach (var lecturer in lecturers)
         {
-            var votes = await lectureVoteService.GetAllVotesByLectureAsync(lecturer.Id, cancellationToken);
+            if (!allLectureVotes.TryGetValue(lecturer.Id, out var votes)) continue;
+            
             foreach (var vote in votes)
             {
                 var normalizedEmail = vote.Email.Trim().ToLowerInvariant();
@@ -334,19 +351,68 @@ public class ReportService
     /// <summary>
     ///     Fills data into the appropriate template sheets based on actual template structure
     /// </summary>
-    private async Task FillDataIntoTemplate(ExcelPackage package, List<LecturerDto> lecturers,
+    private void FillDataIntoTemplate(ExcelPackage package, List<LecturerDto> lecturers,
         IReadOnlyList<FeedbackVoteDto> feedbackVotes, IReadOnlyList<AccountDto> accounts,
-        CancellationToken cancellationToken)
+        Dictionary<Guid, IReadOnlyList<VoteDto>> allLectureVotes)
     {
         var campaignResultSheet = package.Workbook.Worksheets[0];
         var detailedStatsSheet = package.Workbook.Worksheets[1];
         var participantsSheet = package.Workbook.Worksheets[2];
         var evaluationStatsSheet = package.Workbook.Worksheets[3];
 
-        await FillCampaignResultData(campaignResultSheet, lecturers, cancellationToken);
-        await FillDetailedStatsData(detailedStatsSheet, lecturers, feedbackVotes, accounts, cancellationToken);
-        await FillParticipantsData(participantsSheet, lecturers, accounts, cancellationToken);
+        FillCampaignResultData(campaignResultSheet, lecturers);
+        FillDetailedStatsData(detailedStatsSheet, lecturers, feedbackVotes, accounts, allLectureVotes);
+        FillParticipantsData(participantsSheet, lecturers, accounts, allLectureVotes);
         FillEvaluationStatsData(evaluationStatsSheet, feedbackVotes);
+    }
+
+    /// <summary>
+    ///     Safely merges cells by first unmerging any overlapping ranges
+    /// </summary>
+    private static void SafeMergeCells(ExcelWorksheet worksheet, string rangeAddress)
+    {
+        try
+        {
+            var range = worksheet.Cells[rangeAddress];
+            
+            // Check if any cells in the range are already merged
+            var startRow = range.Start.Row;
+            var endRow = range.End.Row;
+            var startCol = range.Start.Column;
+            var endCol = range.End.Column;
+            
+            // Unmerge any overlapping merged ranges by checking merged ranges in the worksheet
+            var mergedRanges = worksheet.MergedCells.ToList();
+            foreach (var mergedCellAddress in mergedRanges)
+            {
+                var mergedRange = worksheet.Cells[mergedCellAddress];
+                
+                // Check if the merged range overlaps with our target range
+                if (IsRangeOverlapping(mergedRange, range))
+                {
+                    mergedRange.Merge = false;
+                }
+            }
+            
+            // Now safely merge the desired range
+            range.Merge = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Warning: Could not merge cells at {rangeAddress}: {ex.Message}");
+            // Continue execution without merging
+        }
+    }
+
+    /// <summary>
+    ///     Checks if two ranges overlap
+    /// </summary>
+    private static bool IsRangeOverlapping(ExcelRange range1, ExcelRange range2)
+    {
+        return range1.Start.Row <= range2.End.Row &&
+               range1.End.Row >= range2.Start.Row &&
+               range1.Start.Column <= range2.End.Column &&
+               range1.End.Column >= range2.Start.Column;
     }
 
     /// <summary>
