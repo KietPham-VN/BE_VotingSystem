@@ -9,7 +9,6 @@ namespace BE_VotingSystem.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "AdminOnly")]
 public class WebImageController(IWebImageService service) : ControllerBase
 {
     /// <summary>
@@ -55,7 +54,7 @@ public class WebImageController(IWebImageService service) : ControllerBase
     public async Task<ActionResult<ApiResponse<WebImageDto>>> GetImageByName(string name, CancellationToken cancellationToken)
     {
         var image = await service.GetImageByName(name, cancellationToken);
-        
+
         if (image is null)
             return NotFound(new ApiResponse<WebImageDto>(null!, "Web image not found"));
 
@@ -75,6 +74,7 @@ public class WebImageController(IWebImageService service) : ControllerBase
         OperationId = "WebImages_Create",
         Tags = ["WebImages"]
     )]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(ApiResponse<WebImageDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -87,8 +87,8 @@ public class WebImageController(IWebImageService service) : ControllerBase
     {
         var image = await service.CreateImage(request, cancellationToken);
         return CreatedAtAction(
-            nameof(GetImageByName), 
-            new { name = image.Name }, 
+            nameof(GetImageByName),
+            new { name = image.Name },
             new ApiResponse<WebImageDto>(image, "Web image created successfully"));
     }
 
@@ -105,6 +105,7 @@ public class WebImageController(IWebImageService service) : ControllerBase
         OperationId = "WebImages_Update",
         Tags = ["WebImages"]
     )]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(ApiResponse<WebImageDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -132,6 +133,7 @@ public class WebImageController(IWebImageService service) : ControllerBase
         OperationId = "WebImages_Delete",
         Tags = ["WebImages"]
     )]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(typeof(ApiResponse<WebImageDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

@@ -49,7 +49,6 @@ TaskScheduler.UnobservedTaskException += (sender, args) =>
     Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] UNOBSERVED TASK EXCEPTION: {args.Exception}");
 };
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -64,7 +63,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .SetIsOriginAllowed(origin => true);
     });
-    
+
     options.AddPolicy("Production", policy =>
     {
         policy.WithOrigins(corsOrigins)
@@ -141,7 +140,6 @@ catch (Exception ex)
 
 if (app.Environment.IsDevelopment())
 {
-    
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -151,7 +149,7 @@ if (app.Environment.IsDevelopment())
         c.DefaultModelsExpandDepth(-1);
         c.DisplayRequestDuration();
     });
-    
+
     app.UseCors("Development");
 }
 else
@@ -159,14 +157,14 @@ else
     app.UseCors("Production");
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
     context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-    
+
     await next();
 });
 
